@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'item.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -20,7 +21,8 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFedeff0),
+      //!AppBar
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: const Text('ENPUNTO ',
@@ -51,6 +53,7 @@ class _HomeState extends State<Home> {
           ),
         ],
       ),
+      //!Menú lateral
       endDrawer: Drawer(
         child: ListView(
           children: <Widget>[
@@ -84,17 +87,18 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
+      //!Cuerpo
       body: SingleChildScrollView(
         child: Column(
           children: [
             //!Contenedor con las imágenes
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
               child: Column(
                 children: <Widget>[
                   SizedBox(
                     height: MediaQuery.of(context).size.height *
-                        0.6, // Ajusta la altura del PageView aquí
+                        0.52, // Ajusta la altura del PageView aquí
                     child: Stack(
                       children: <Widget>[
                         PageView.builder(
@@ -153,28 +157,55 @@ class _HomeState extends State<Home> {
                         const NeverScrollableScrollPhysics(), // Deshabilita el scroll en el ListView
                     children: [
                       Container(
-                          padding: const EdgeInsets.all(10),
-                          color: const Color(0xFF80A6AD),
-                          child: const Text(
-                            'UNA\nMEZCLA DE\nDISEÑO Y\nCOMODIDAD',
-                            style: TextStyle(
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF203040),
-                            ),
-                          )),
+                        color: const Color(0xFF80A6AD),
+                        child: const Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'UNA\nMEZCLA DE\nDISEÑO Y\nCOMODIDAD',
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF203040),
+                                ),
+                              ),
+                              Text(
+                                'Crea el espacio \nperfecto',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              Divider(
+                                color: Color(0xFF607d82),
+                                thickness: 2,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                       const SizedBox(
                         height: 10,
                       ),
-                      const SectionWidget(texto: 'DECORACIÓN'),
+                      const SectionWidget(
+                          texto: 'DECORACIÓN', rutaNavegacion: Home()),
                       const ItemWidget(
+                        rutaImagen: 'images/silla.jpg',
+                        rutaNavegacion: Item(
+                          previousViewName: 'Inicio',
                           rutaImagen: 'images/silla.jpg',
-                          rutaNavegacion: Home()),
-                      const SectionWidget(texto: 'COCINA'),
+                        ),
+                      ),
+                      const SectionWidget(
+                          texto: 'COCINA', rutaNavegacion: Home()),
                       const ItemWidget(
                           rutaImagen: 'images/cucharas.jpg',
                           rutaNavegacion: Home()),
-                      const SectionWidget(texto: 'RECÁMARA'),
+                      const SectionWidget(
+                          texto: 'RECÁMARA', rutaNavegacion: Home()),
                       const ItemWidget(
                           rutaImagen: 'images/Cojín.jpg',
                           rutaNavegacion: Home()),
@@ -217,37 +248,49 @@ class CustomListTile extends StatelessWidget {
 //!Widget para mostrar el titulo de las secciones
 class SectionWidget extends StatelessWidget {
   final String texto;
+  final Widget rutaNavegacion;
 
-  const SectionWidget({super.key, required this.texto});
+  const SectionWidget(
+      {super.key, required this.texto, required this.rutaNavegacion});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          height: 180,
-          padding: const EdgeInsets.all(10),
-          color: const Color(0xFF80A6AD),
-          child: Center(
-            child: Text(
-              texto,
-              style: const TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => rutaNavegacion,
+          ),
+        );
+      },
+      child: Column(
+        children: [
+          Container(
+            height: 180,
+            padding: const EdgeInsets.all(10),
+            color: const Color(0xFF80A6AD),
+            child: Center(
+              child: Text(
+                texto,
+                style: const TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
             ),
           ),
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-      ],
+          const SizedBox(
+            height: 10,
+          ),
+        ],
+      ),
     );
   }
 }
 
-//!Widget para mostrar las imágenes de los productos
+//!Widget para mostrar los items de las secciones
 class ItemWidget extends StatelessWidget {
   final String rutaImagen;
   final Widget rutaNavegacion;
@@ -297,5 +340,5 @@ final List<String> images = [
   'https://hips.hearstapps.com/hmg-prod/images/plantas-de-interior-resistentes-2-1543351859.jpg',
   'https://hips.hearstapps.com/hmg-prod/images/plantas-de-interior-resistentes-2-1543351859.jpg',
   'https://hips.hearstapps.com/hmg-prod/images/plantas-de-interior-resistentes-2-1543351859.jpg',
-  // Agrega más URLs de imágenes si lo deseas
+  //imagenes para probar el PageView
 ];
