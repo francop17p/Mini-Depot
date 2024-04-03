@@ -1,1 +1,2 @@
 Home: (appbar) Agregar una separación entre el titulo y el subrayado
+Hone: Cambiar las rutas del appbar e imagenes de items

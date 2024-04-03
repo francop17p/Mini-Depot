@@ -1,4 +1,7 @@
 {
   "cmake.configureOnOpen": false,
-  "cSpell.words": ["ENPUNTO"]
+  "cSpell.words": [
+    "ENPUNTO",
+    "movil"
+  ]
 }

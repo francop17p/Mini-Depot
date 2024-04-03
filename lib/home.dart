@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 
 void main() {
   runApp(MaterialApp(
-    // Rutas de navegación
-    routes: {
-      '/home': (context) => const Home(),
-    },
     debugShowCheckedModeBanner: false,
     home: const Home(),
   ));
@@ -19,6 +15,8 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  int _currentPage = 0;
+  final PageController _pageController = PageController(initialPage: 0);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,35 +75,227 @@ class _HomeState extends State<Home> {
                 Navigator.pop(context);
               },
             ),
-            const CustomListTile(title: 'Inicio', route: '/home'),
-            const CustomListTile(title: 'Deco', route: '/home'),
-            const CustomListTile(title: 'Cocina', route: '/home'),
-            const CustomListTile(title: 'Recámara', route: '/home'),
-            const CustomListTile(title: 'Info', route: '/home'),
-            const CustomListTile(title: 'Contacto', route: '/home'),
+            const CustomListTile(title: 'Inicio', rutaNavegacion: Home()),
+            const CustomListTile(title: 'Deco', rutaNavegacion: Home()),
+            const CustomListTile(title: 'Cocina', rutaNavegacion: Home()),
+            const CustomListTile(title: 'Recámara', rutaNavegacion: Home()),
+            const CustomListTile(title: 'Info', rutaNavegacion: Home()),
+            const CustomListTile(title: 'Contacto', rutaNavegacion: Home()),
           ],
         ),
       ),
-      body: const Center(
-        child: Text('Contenido de la aplicación'),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            //!Contenedor con las imágenes
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                children: <Widget>[
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height *
+                        0.6, // Ajusta la altura del PageView aquí
+                    child: Stack(
+                      children: <Widget>[
+                        PageView.builder(
+                          controller: _pageController,
+                          itemCount: images.length,
+                          onPageChanged: (int page) {
+                            setState(() {
+                              _currentPage = page;
+                            });
+                          },
+                          itemBuilder: (BuildContext context, int index) {
+                            return Image.network(images[index]);
+                          },
+                        ),
+                        if (_currentPage != 0)
+                          Positioned(
+                            left: 10,
+                            top: MediaQuery.of(context).size.height * 0.3 -
+                                30, // Ajusta la posición vertical de las flechas
+                            child: IconButton(
+                              iconSize: 40,
+                              color: Colors.white,
+                              icon: const Icon(Icons.chevron_left),
+                              onPressed: () {
+                                _pageController.previousPage(
+                                  duration: const Duration(milliseconds: 500),
+                                  curve: Curves.easeInOut,
+                                );
+                              },
+                            ),
+                          ),
+                        if (_currentPage != 2)
+                          Positioned(
+                            right: 10,
+                            top: MediaQuery.of(context).size.height * 0.3 -
+                                30, // Ajusta la posición vertical de las flechas
+                            child: IconButton(
+                              iconSize: 40,
+                              color: Colors.white,
+                              icon: const Icon(Icons.chevron_right),
+                              onPressed: () {
+                                _pageController.nextPage(
+                                  duration: const Duration(milliseconds: 500),
+                                  curve: Curves.easeInOut,
+                                );
+                              },
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  //!Contenedor con el ListView
+                  ListView(
+                    shrinkWrap: true,
+                    physics:
+                        const NeverScrollableScrollPhysics(), // Deshabilita el scroll en el ListView
+                    children: [
+                      Container(
+                          padding: const EdgeInsets.all(10),
+                          color: const Color(0xFF80A6AD),
+                          child: const Text(
+                            'UNA\nMEZCLA DE\nDISEÑO Y\nCOMODIDAD',
+                            style: TextStyle(
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF203040),
+                            ),
+                          )),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      const SectionWidget(texto: 'DECORACIÓN'),
+                      const ItemWidget(
+                          rutaImagen: 'images/silla.jpg',
+                          rutaNavegacion: Home()),
+                      const SectionWidget(texto: 'COCINA'),
+                      const ItemWidget(
+                          rutaImagen: 'images/cucharas.jpg',
+                          rutaNavegacion: Home()),
+                      const SectionWidget(texto: 'RECÁMARA'),
+                      const ItemWidget(
+                          rutaImagen: 'images/Cojín.jpg',
+                          rutaNavegacion: Home()),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
+//!Widget para mostrar los elementos del menú
 class CustomListTile extends StatelessWidget {
   final String title;
-  final String route;
+  final Widget rutaNavegacion;
 
-  const CustomListTile({super.key, required this.title, required this.route});
+  const CustomListTile(
+      {super.key, required this.title, required this.rutaNavegacion});
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(title),
       onTap: () {
-        Navigator.pushNamed(context, route);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => rutaNavegacion,
+          ),
+        );
       },
     );
   }
 }
+
+//!Widget para mostrar el titulo de las secciones
+class SectionWidget extends StatelessWidget {
+  final String texto;
+
+  const SectionWidget({super.key, required this.texto});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          height: 180,
+          padding: const EdgeInsets.all(10),
+          color: const Color(0xFF80A6AD),
+          child: Center(
+            child: Text(
+              texto,
+              style: const TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+      ],
+    );
+  }
+}
+
+//!Widget para mostrar las imágenes de los productos
+class ItemWidget extends StatelessWidget {
+  final String rutaImagen;
+  final Widget rutaNavegacion;
+
+  const ItemWidget(
+      {super.key, required this.rutaImagen, required this.rutaNavegacion});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => rutaNavegacion,
+              ),
+            );
+          },
+          child: Stack(
+            children: [
+              Image.asset(
+                rutaImagen,
+                fit: BoxFit
+                    .cover, // Ajusta la imagen para cubrir todo el contenedor
+              ),
+              Positioned.fill(
+                child: Container(
+                  color: Colors
+                      .transparent, // Para que el contenedor sea transparente
+                  // Aquí puedes agregar cualquier contenido adicional que necesites
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+      ],
+    );
+  }
+}
+
+final List<String> images = [
+  'https://hips.hearstapps.com/hmg-prod/images/plantas-de-interior-resistentes-2-1543351859.jpg',
+  'https://hips.hearstapps.com/hmg-prod/images/plantas-de-interior-resistentes-2-1543351859.jpg',
+  'https://hips.hearstapps.com/hmg-prod/images/plantas-de-interior-resistentes-2-1543351859.jpg',
+  // Agrega más URLs de imágenes si lo deseas
+];
