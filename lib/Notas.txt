@@ -1,2 +1,4 @@
 Home: (appbar) Agregar una separación entre el titulo y el subrayado
-Hone: Cambiar las rutas del appbar e imagenes de items
+Home: Cambiar las rutas del appbar e imagenes de items
+
+en la clase custom_widgets se pondrán las clases compartidas entre vistas

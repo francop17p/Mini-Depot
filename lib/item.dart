@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_movil/home.dart';
-import 'package:badges/badges.dart' as badges;
+import 'custom_widgets.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:input_quantity/input_quantity.dart';
 
 class Item extends StatefulWidget {
   final String previousViewName;
@@ -21,6 +23,8 @@ class _ItemState extends State<Item> {
   String selectedColorName = 'Ninguno';
   int cantidad = 1;
   final ValueNotifier<int> cartItemCount = ValueNotifier<int>(0);
+  bool _isExpanded = true;
+  bool _isExpanded2 = true;
 
   final List<Color> colors = [
     Colors.red,
@@ -53,96 +57,50 @@ class _ItemState extends State<Item> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFedeff0),
-      //!AppBar
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text(
-          'ENPUNTO',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF405357),
-            decoration: TextDecoration.underline,
-            decorationColor: Color(0xFF405357),
-            decorationThickness: 3, // Grosor del subrayado
-            letterSpacing: 3,
-          ),
-        ),
-        actions: [
-          //!Botón del carrito
-          ValueListenableBuilder<int>(
-            valueListenable: cartItemCount,
-            builder: (context, count, child) {
-              return badges.Badge(
-                badgeContent: Text(
-                  count.toString(),
-                  style: const TextStyle(color: Colors.white),
-                ),
-                badgeStyle: badges.BadgeStyle(badgeColor: Colors.blue.shade300),
-                badgeAnimation: const badges.BadgeAnimation.fade(
-                    animationDuration: Duration(seconds: 1)),
-                position: badges.BadgePosition.topEnd(top: -6, end: -3),
-                child: IconButton(
-                  icon: const Icon(Icons.shopping_cart),
-                  onPressed: () {
-                    // Acción del botón del carrito
-                  },
-                ),
-              );
-            },
-          ),
-          Builder(
-            builder: (context) => IconButton(
-              color: const Color(0xFF607D82),
-              icon: const Icon(Icons.menu),
-              onPressed: () {
-                Scaffold.of(context).openEndDrawer();
-              },
-            ),
-          ),
-        ],
-      ),
-      //!Menú lateral
-      endDrawer: Drawer(
-        child: ListView(
-          children: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            ListTile(
-              leading: const CircleAvatar(
-                radius: 10,
-                backgroundColor: Color(0xFF607D82),
-                child: Icon(
-                  color: Colors.white,
-                  Icons.person,
-                  size: 15,
-                ),
+        backgroundColor: const Color(0xFFedeff0),
+        //!AppBar
+        appBar: CustomAppBar(cartItemCount: cartItemCount),
+
+        //!Menú lateral
+        endDrawer: Drawer(
+          child: ListView(
+            children: <Widget>[
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
               ),
-              title: const Text('Entrar'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            const CustomListTile(title: 'Inicio', rutaNavegacion: Home()),
-            const CustomListTile(title: 'Deco', rutaNavegacion: Home()),
-            const CustomListTile(title: 'Cocina', rutaNavegacion: Home()),
-            const CustomListTile(title: 'Recámara', rutaNavegacion: Home()),
-            const CustomListTile(title: 'Info', rutaNavegacion: Home()),
-            const CustomListTile(title: 'Contacto', rutaNavegacion: Home()),
-          ],
+              ListTile(
+                leading: const CircleAvatar(
+                  radius: 10,
+                  backgroundColor: Color(0xFF607D82),
+                  child: Icon(
+                    color: Colors.white,
+                    Icons.person,
+                    size: 15,
+                  ),
+                ),
+                title: const Text('Entrar'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              const CustomListTile(title: 'Inicio', rutaNavegacion: Home()),
+              const CustomListTile(title: 'Deco', rutaNavegacion: Home()),
+              const CustomListTile(title: 'Cocina', rutaNavegacion: Home()),
+              const CustomListTile(title: 'Recámara', rutaNavegacion: Home()),
+              const CustomListTile(title: 'Info', rutaNavegacion: Home()),
+              const CustomListTile(title: 'Contacto', rutaNavegacion: Home()),
+            ],
+          ),
         ),
-      ),
-      //!Cuerpo
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        //!Cuerpo
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 5, 20, 20),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               GestureDetector(
                 onTap: () {
                   Navigator.pop(context);
@@ -160,11 +118,34 @@ class _ItemState extends State<Item> {
               const SizedBox(
                 height: 20,
               ),
-              Center(
-                child: Image.asset(
-                  widget.rutaImagen,
-                  width: 300,
-                  height: 300,
+              GestureDetector(
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => Dialog(
+                      child: Stack(
+                        alignment: Alignment.topRight,
+                        children: [
+                          PhotoView(
+                            imageProvider: AssetImage(widget.rutaImagen),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.close),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+                child: Center(
+                  child: Image.asset(
+                    widget.rutaImagen,
+                    width: 300,
+                    height: 300,
+                  ),
                 ),
               ),
               const SizedBox(
@@ -200,13 +181,13 @@ class _ItemState extends State<Item> {
                 children: colors.map((color) {
                   return CircleItem(
                     color: color,
-                    size:
-                        20.0, // Ajusta este valor para cambiar el tamaño de los círculos
+                    size: 20.0,
                     onTap: () {
                       setState(() {
                         selectedColorName = colorNames[color] ?? 'Desconocido';
                       });
                     },
+                    isSelected: selectedColorName == colorNames[color],
                   );
                 }).toList(),
               ),
@@ -214,6 +195,8 @@ class _ItemState extends State<Item> {
                 height: 20,
               ),
               //!selector de cantidad
+              //Esta esta opción con el paquete input_quantity o
+              // regresar a el código anterior
               const Text('Cantidad:'),
               const SizedBox(
                 height: 10,
@@ -223,61 +206,15 @@ class _ItemState extends State<Item> {
                 children: [
                   SizedBox(
                     width: 80,
-                    child: TextFormField(
-                      controller: _cantidadController,
-                      keyboardType: TextInputType.number,
-                      textAlign: TextAlign.center,
-                      decoration: InputDecoration(
-                        border: const OutlineInputBorder(),
-                        contentPadding:
-                            const EdgeInsets.symmetric(vertical: 0.0),
-                        suffixIcon: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: IconButton(
-                                padding: EdgeInsets.zero,
-                                icon: const Icon(
-                                  Icons.arrow_drop_up,
-                                  size: 20,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    cantidad++;
-                                    _cantidadController.text =
-                                        cantidad.toString();
-                                  });
-                                },
-                              ),
-                            ),
-                            SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: IconButton(
-                                padding: EdgeInsets.zero,
-                                icon: const Icon(
-                                  Icons.arrow_drop_down,
-                                  size: 20,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    if (cantidad > 1) {
-                                      cantidad--;
-                                      _cantidadController.text =
-                                          cantidad.toString();
-                                    }
-                                  });
-                                },
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      onChanged: (value) {
+                    child: InputQty(
+                      decoration: const QtyDecorationProps(
+                          qtyStyle: QtyStyle.btnOnRight,
+                          orientation: ButtonOrientation.vertical),
+                      initVal: cantidad,
+                      minVal: 1,
+                      onQtyChanged: (value) {
                         setState(() {
-                          cantidad = int.tryParse(value) ?? 1;
+                          cantidad = value;
                         });
                       },
                     ),
@@ -326,11 +263,64 @@ class _ItemState extends State<Item> {
                       style: TextStyle(color: Colors.white)),
                 ),
               ),
-            ],
+              const SizedBox(
+                height: 20,
+              ),
+              //!Descripción
+              const Text(
+                  'Descripción del producto. Lugar ideal para agregar más información sobre tu producto. A los clientes les gusta saber qué están comprando de antemano.'),
+              const SizedBox(
+                height: 20,
+              ),
+              //!Información del producto
+              Theme(
+                data: Theme.of(context)
+                    .copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  initiallyExpanded: true,
+                  title: const Text('INFORMACIÓN DEL PRODUCTO'),
+                  trailing: Icon(_isExpanded ? Icons.remove : Icons.add),
+                  onExpansionChanged: (isExpanded) {
+                    setState(() {
+                      _isExpanded = isExpanded;
+                    });
+                  },
+                  children: const [
+                    ListTile(
+                      title: Text(
+                        'Detalle del producto. Lugar ideal para agregar más información sobre tu producto como su tamaño, materiales, instrucciones de uso y mantenimiento. También es un buen espacio para explicar lo especial que es tu producto y sus beneficios. A los compradores les gusta saber lo que van a recibir antes de comprarlo, así que proporciona toda la información posible para que puedan comprar con seguridad y confianza.',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              Theme(
+                data: Theme.of(context)
+                    .copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  initiallyExpanded: true,
+                  title: const Text('POLÍTICA DE DEVOLUCIÓN Y REEMBOLSO'),
+                  trailing: Icon(_isExpanded2 ? Icons.remove : Icons.add),
+                  onExpansionChanged: (isExpanded2) {
+                    setState(() {
+                      _isExpanded2 = isExpanded2;
+                    });
+                  },
+                  children: const [
+                    ListTile(
+                      title: Text(
+                        'Política de devolución y reembolso. Lugar ideal para explicar a tus clientes qué hacer si no están satisfechos con su compra. Tener una política de reembolso o cambio clara es una gran manera de generar confianza y garantizar que tus clientes compren con seguridad.',
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ]),
           ),
-        ),
-      ),
-    );
+        ));
   }
 }
 
@@ -338,12 +328,14 @@ class CircleItem extends StatelessWidget {
   final Color color;
   final double size;
   final VoidCallback onTap;
+  final bool isSelected;
 
   const CircleItem({
     Key? key,
     required this.color,
     required this.size,
     required this.onTap,
+    this.isSelected = false,
   }) : super(key: key);
 
   @override
@@ -356,6 +348,10 @@ class CircleItem extends StatelessWidget {
         decoration: BoxDecoration(
           color: color,
           shape: BoxShape.circle,
+          border: Border.all(
+            color: isSelected ? Colors.black : Colors.transparent,
+            width: isSelected ? 1.0 : 0.0,
+          ),
         ),
       ),
     );

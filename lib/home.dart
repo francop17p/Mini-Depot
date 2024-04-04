@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'item.dart';
+import 'custom_widgets.dart';
 
 void main() {
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
     debugShowCheckedModeBanner: false,
-    home: const Home(),
+    home: Home(),
   ));
 }
 
@@ -18,41 +19,15 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int _currentPage = 0;
   final PageController _pageController = PageController(initialPage: 0);
+  final ValueNotifier<int> cartItemCount = ValueNotifier<int>(0);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFedeff0),
       //!AppBar
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text('ENPUNTO ',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF405357),
-              decoration: TextDecoration.underline,
-              decorationColor: Color(0xFF405357),
-              decorationThickness: 3, //Grosor del subrayado
-              letterSpacing: 3,
-            )),
-        actions: [
-          IconButton(
-            color: const Color(0xFF607D82),
-            icon: const Icon(
-              Icons.shopping_bag,
-            ),
-            onPressed: () {},
-          ),
-          Builder(
-            builder: (context) => IconButton(
-              color: const Color(0xFF607D82),
-              icon: const Icon(Icons.menu),
-              onPressed: () {
-                Scaffold.of(context).openEndDrawer();
-              },
-            ),
-          ),
-        ],
-      ),
+      appBar: CustomAppBar(cartItemCount: cartItemCount),
+
       //!Menú lateral
       endDrawer: Drawer(
         child: ListView(
