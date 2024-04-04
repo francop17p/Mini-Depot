@@ -118,22 +118,36 @@ class _ItemState extends State<Item> {
               const SizedBox(
                 height: 20,
               ),
+              //!Imagen
               GestureDetector(
                 onTap: () {
                   showDialog(
                     context: context,
                     builder: (context) => Dialog(
+                      backgroundColor: Colors.transparent,
                       child: Stack(
                         alignment: Alignment.topRight,
                         children: [
                           PhotoView(
                             imageProvider: AssetImage(widget.rutaImagen),
+                            backgroundDecoration: const BoxDecoration(
+                              color: Colors.transparent,
+                            ),
                           ),
-                          IconButton(
-                            icon: Icon(Icons.close),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
+                          Container(
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.close,
+                                color: Colors.black,
+                              ),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
                           ),
                         ],
                       ),
@@ -195,8 +209,7 @@ class _ItemState extends State<Item> {
                 height: 20,
               ),
               //!selector de cantidad
-              //Esta esta opción con el paquete input_quantity o
-              // regresar a el código anterior
+              //todo: Esta esta opción con el paquete input_quantity o regresar a el código anterior
               const Text('Cantidad:'),
               const SizedBox(
                 height: 10,
