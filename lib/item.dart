@@ -62,39 +62,7 @@ class _ItemState extends State<Item> {
         appBar: CustomAppBar(cartItemCount: cartItemCount),
 
         //!Menú lateral
-        endDrawer: Drawer(
-          child: ListView(
-            children: <Widget>[
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              ListTile(
-                leading: const CircleAvatar(
-                  radius: 10,
-                  backgroundColor: Color(0xFF607D82),
-                  child: Icon(
-                    color: Colors.white,
-                    Icons.person,
-                    size: 15,
-                  ),
-                ),
-                title: const Text('Entrar'),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-              const CustomListTile(title: 'Inicio', rutaNavegacion: Home()),
-              const CustomListTile(title: 'Deco', rutaNavegacion: Home()),
-              const CustomListTile(title: 'Cocina', rutaNavegacion: Home()),
-              const CustomListTile(title: 'Recámara', rutaNavegacion: Home()),
-              const CustomListTile(title: 'Info', rutaNavegacion: Home()),
-              const CustomListTile(title: 'Contacto', rutaNavegacion: Home()),
-            ],
-          ),
-        ),
+        endDrawer: const CustomDrawer(),
         //!Cuerpo
         body: SingleChildScrollView(
           child: Padding(

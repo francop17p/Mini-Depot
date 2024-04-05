@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges;
+import 'home.dart';
 
 //! Widget para crear el appbar
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -59,6 +60,72 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+//! Widget para crear el menú lateral
+class CustomDrawer extends StatelessWidget {
+  const CustomDrawer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        children: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          ListTile(
+            leading: const CircleAvatar(
+              radius: 10,
+              backgroundColor: Color(0xFF607D82),
+              child: Icon(
+                color: Colors.white,
+                Icons.person,
+                size: 15,
+              ),
+            ),
+            title: const Text('Entrar'),
+            onTap: () {
+              Navigator.pop(context);
+            },
+          ),
+          const CustomListTile(title: 'Inicio', rutaNavegacion: Home()),
+          const CustomListTile(title: 'Deco', rutaNavegacion: Home()),
+          const CustomListTile(title: 'Cocina', rutaNavegacion: Home()),
+          const CustomListTile(title: 'Recámara', rutaNavegacion: Home()),
+          const CustomListTile(title: 'Info', rutaNavegacion: Home()),
+          const CustomListTile(title: 'Contacto', rutaNavegacion: Home()),
+        ],
+      ),
+    );
+  }
+}
+
+//! Widget para crear los elementos de la lista del menú lateral
+class CustomListTile extends StatelessWidget {
+  final String title;
+  final Widget rutaNavegacion;
+
+  const CustomListTile(
+      {super.key, required this.title, required this.rutaNavegacion});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text(title),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => rutaNavegacion,
+          ),
+        );
+      },
     );
   }
 }

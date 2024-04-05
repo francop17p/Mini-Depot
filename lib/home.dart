@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_movil/category.dart';
 import 'item.dart';
 import 'custom_widgets.dart';
 
@@ -29,39 +30,8 @@ class _HomeState extends State<Home> {
       appBar: CustomAppBar(cartItemCount: cartItemCount),
 
       //!Menú lateral
-      endDrawer: Drawer(
-        child: ListView(
-          children: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            ListTile(
-              leading: const CircleAvatar(
-                radius: 10,
-                backgroundColor: Color(0xFF607D82),
-                child: Icon(
-                  color: Colors.white,
-                  Icons.person,
-                  size: 15,
-                ),
-              ),
-              title: const Text('Entrar'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            const CustomListTile(title: 'Inicio', rutaNavegacion: Home()),
-            const CustomListTile(title: 'Deco', rutaNavegacion: Home()),
-            const CustomListTile(title: 'Cocina', rutaNavegacion: Home()),
-            const CustomListTile(title: 'Recámara', rutaNavegacion: Home()),
-            const CustomListTile(title: 'Info', rutaNavegacion: Home()),
-            const CustomListTile(title: 'Contacto', rutaNavegacion: Home()),
-          ],
-        ),
-      ),
+      endDrawer: const CustomDrawer(),
+
       //!Cuerpo
       body: SingleChildScrollView(
         child: Column(
@@ -166,7 +136,11 @@ class _HomeState extends State<Home> {
                         height: 10,
                       ),
                       const SectionWidget(
-                          texto: 'DECORACIÓN', rutaNavegacion: Home()),
+                        texto: 'DECORACIÓN',
+                        rutaNavegacion: CategoryPage(
+                          title: 'DECORACIÓN',
+                        ),
+                      ),
                       const ItemWidget(
                         rutaImagen: 'images/silla.jpg',
                         rutaNavegacion: Item(
@@ -175,12 +149,18 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                       const SectionWidget(
-                          texto: 'COCINA', rutaNavegacion: Home()),
+                          texto: 'COCINA',
+                          rutaNavegacion: CategoryPage(
+                            title: 'COCINA',
+                          )),
                       const ItemWidget(
                           rutaImagen: 'images/cucharas.jpg',
                           rutaNavegacion: Home()),
                       const SectionWidget(
-                          texto: 'RECÁMARA', rutaNavegacion: Home()),
+                          texto: 'RECÁMARA',
+                          rutaNavegacion: CategoryPage(
+                            title: 'RECÁMARA',
+                          )),
                       const ItemWidget(
                           rutaImagen: 'images/Cojín.jpg',
                           rutaNavegacion: Home()),
@@ -192,30 +172,6 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
-    );
-  }
-}
-
-//!Widget para mostrar los elementos del menú
-class CustomListTile extends StatelessWidget {
-  final String title;
-  final Widget rutaNavegacion;
-
-  const CustomListTile(
-      {super.key, required this.title, required this.rutaNavegacion});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(title),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => rutaNavegacion,
-          ),
-        );
-      },
     );
   }
 }
@@ -290,14 +246,11 @@ class ItemWidget extends StatelessWidget {
             children: [
               Image.asset(
                 rutaImagen,
-                fit: BoxFit
-                    .cover, // Ajusta la imagen para cubrir todo el contenedor
+                fit: BoxFit.cover,
               ),
               Positioned.fill(
                 child: Container(
-                  color: Colors
-                      .transparent, // Para que el contenedor sea transparente
-                  // Aquí puedes agregar cualquier contenido adicional que necesites
+                  color: Colors.transparent,
                 ),
               ),
             ],
