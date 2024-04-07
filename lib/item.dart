@@ -77,7 +77,7 @@ class _ItemState extends State<Item> {
                   children: [
                     const Icon(Icons.chevron_left),
                     Text(
-                      'Volver a ${widget.previousViewName}',
+                      'volver a ${widget.previousViewName.toLowerCase()}',
                       style: const TextStyle(fontSize: 17),
                     ),
                   ],
