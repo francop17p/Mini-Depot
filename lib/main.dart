@@ -5,9 +5,11 @@ import 'package:proyecto_movil/database.dart';
 import 'package:proyecto_movil/home.dart';
 import 'package:proyecto_movil/item.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   //fillDatabase();
-  //imprimirProductos();
+  imprimirProductos();
 
   runApp(const MyApp());
 }
@@ -19,19 +21,21 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Flutter Demo',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
-        // home: const Item(
-        //   previousViewName: 'Inicio',
-        //   rutaImagen: 'images/silla.jpg',
-        // ));
-        home: const CategoryPage(
-          title: "DECORACIÓN",
-        ));
+      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      // home: const Item(
+      //   previousViewName: 'Inicio',
+      //   rutaImagen: 'images/silla.jpg',
+      // ));
+      // home: const CategoryPage(
+      //   title: "DECORACIÓN",
+      // )
+      home: const Home(),
+    );
   }
 }
 
@@ -41,7 +45,7 @@ void fillDatabase() async {
   // Producto 1
   Map<String, dynamic> row = {
     DatabaseHelper.columnTitle: 'Silla de madera',
-    DatabaseHelper.columnImage: 'images/silla.jpg',
+    DatabaseHelper.columnImage: 'images/Silla.jpg',
     DatabaseHelper.columnPrice: 9.99
   };
   await db.insert(row);

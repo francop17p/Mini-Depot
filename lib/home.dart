@@ -142,10 +142,10 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                       const ItemWidget(
-                        rutaImagen: 'images/silla.jpg',
+                        rutaImagen: 'images/Silla.jpg',
                         rutaNavegacion: Item(
                           previousViewName: 'Inicio',
-                          rutaImagen: 'images/silla.jpg',
+                          rutaImagen: 'images/Silla.jpg',
                         ),
                       ),
                       const SectionWidget(
@@ -154,7 +154,7 @@ class _HomeState extends State<Home> {
                             title: 'COCINA',
                           )),
                       const ItemWidget(
-                          rutaImagen: 'images/cucharas.jpg',
+                          rutaImagen: 'images/Cucharas.jpg',
                           rutaNavegacion: Home()),
                       const SectionWidget(
                           texto: 'RECÁMARA',
