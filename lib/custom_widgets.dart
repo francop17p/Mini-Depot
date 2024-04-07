@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges;
 import 'home.dart';
+import 'category.dart';
 
 //! Widget para crear el appbar
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -79,6 +81,7 @@ class CustomDrawer extends StatelessWidget {
               Navigator.of(context).pop();
             },
           ),
+          //!Icono Entrar
           ListTile(
             leading: const CircleAvatar(
               radius: 10,
@@ -95,9 +98,13 @@ class CustomDrawer extends StatelessWidget {
             },
           ),
           const CustomListTile(title: 'Inicio', rutaNavegacion: Home()),
-          const CustomListTile(title: 'Deco', rutaNavegacion: Home()),
-          const CustomListTile(title: 'Cocina', rutaNavegacion: Home()),
-          const CustomListTile(title: 'Recámara', rutaNavegacion: Home()),
+          const CustomListTile(
+              title: 'Deco', rutaNavegacion: CategoryPage(title: 'DECORACIÓN')),
+          const CustomListTile(
+              title: 'Cocina', rutaNavegacion: CategoryPage(title: 'COCINA')),
+          const CustomListTile(
+              title: 'Recámara',
+              rutaNavegacion: CategoryPage(title: 'RECÁMARA')),
           const CustomListTile(title: 'Info', rutaNavegacion: Home()),
           const CustomListTile(title: 'Contacto', rutaNavegacion: Home()),
         ],

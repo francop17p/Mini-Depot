@@ -25,7 +25,7 @@ class _CategoryPageState extends State<CategoryPage> {
         //!Cuerpo
         body: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
+            padding: const EdgeInsets.fromLTRB(50, 4, 50, 50),
             child: ListView(
               shrinkWrap: true,
               physics:
@@ -102,6 +102,9 @@ class ItemWidget extends StatelessWidget {
               ),
             ],
           ),
+        ),
+        const SizedBox(
+          height: 10,
         ),
         const Align(
           alignment: Alignment.centerLeft,
