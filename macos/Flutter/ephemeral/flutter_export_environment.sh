@@ -1,7 +1,7 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=D:\flutter"
-export "FLUTTER_APPLICATION_PATH=D:\OneDrive - Universidad Autonoma de San Luis Potosi - UASLP\Trabajos\FUNDAMENTOS DE DESARROLLO MOVIL\Proyectos\proyecto-final-mini-depot"
+export "FLUTTER_ROOT=C:\Flutter\flutter_windows_3.16.9-stable\flutter"
+export "FLUTTER_APPLICATION_PATH=C:\Users\Franco\OneDrive - Universidad Autonoma de San Luis Potosi - UASLP\Trabajos\FUNDAMENTOS DE DESARROLLO MOVIL\Proyectos\proyecto-final-mini-depot"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_BUILD_DIR=build"
 export "FLUTTER_BUILD_NAME=1.0.0"

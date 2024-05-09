@@ -66,19 +66,30 @@ class _ItemState extends State<Item> {
         //!Cuerpo
         body: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 5, 20, 20),
+            padding: EdgeInsets.fromLTRB(
+              MediaQuery.of(context).size.width * 0.08,
+              MediaQuery.of(context).size.height * 0.02,
+              MediaQuery.of(context).size.width * 0.08,
+              MediaQuery.of(context).size.height * 0.04,
+            ),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              //!Volver a la vista anterior
               GestureDetector(
                 onTap: () {
                   Navigator.pop(context);
                 },
                 child: Row(
                   children: [
-                    const Icon(Icons.chevron_left),
+                    Icon(
+                      Icons.chevron_left,
+                      size: MediaQuery.of(context).size.width * 0.04,
+                    ),
                     Text(
                       'volver a ${widget.previousViewName.toLowerCase()}',
-                      style: const TextStyle(fontSize: 17),
+                      style: TextStyle(
+                        fontSize: MediaQuery.of(context).size.width * 0.04,
+                      ),
                     ),
                   ],
                 ),
@@ -86,7 +97,7 @@ class _ItemState extends State<Item> {
               const SizedBox(
                 height: 20,
               ),
-              //!Imagen
+              //!Ampliar imagen al hacer clic
               GestureDetector(
                 onTap: () {
                   showDialog(
@@ -125,8 +136,7 @@ class _ItemState extends State<Item> {
                 child: Center(
                   child: Image.asset(
                     widget.rutaImagen,
-                    width: 300,
-                    height: 300,
+                    width: double.infinity,
                   ),
                 ),
               ),
@@ -207,8 +217,8 @@ class _ItemState extends State<Item> {
               ),
               //!Botón de agregar al carrito
               SizedBox(
-                width: 220, // Ajusta este valor a lo que necesites
-                height: 30, // Ajusta este valor a lo que necesites
+                width: double.infinity,
+                height: MediaQuery.of(context).size.width * 0.08,
                 child: ElevatedButton(
                   onPressed: () {
                     cartItemCount.value += cantidad;
@@ -228,8 +238,8 @@ class _ItemState extends State<Item> {
                 height: 10,
               ),
               SizedBox(
-                width: 220, // Ajusta este valor a lo que necesites
-                height: 30, // Ajusta este valor a lo que necesites
+                width: double.infinity,
+                height: MediaQuery.of(context).size.width * 0.08,
                 child: ElevatedButton(
                   onPressed: () {
                     // Acción del botón
@@ -278,6 +288,7 @@ class _ItemState extends State<Item> {
               const SizedBox(
                 height: 20,
               ),
+              //!Política de devolución y reembolso
               Theme(
                 data: Theme.of(context)
                     .copyWith(dividerColor: Colors.transparent),

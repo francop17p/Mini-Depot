@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "953537353019",
+    "project_id": "minidepot-552c8",
+    "storage_bucket": "minidepot-552c8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:953537353019:android:11366211c034111f54d31e",
+        "android_client_info": {
+          "package_name": "com.example.proyecto_movil"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDig1mPLJprmB3YNOPVNCt4CQAfARfxjYQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

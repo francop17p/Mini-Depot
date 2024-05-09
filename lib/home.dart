@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_movil/category.dart';
 import 'item.dart';
 import 'custom_widgets.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 void main() {
   runApp(const MaterialApp(
@@ -41,59 +42,30 @@ class _HomeState extends State<Home> {
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
               child: Column(
                 children: <Widget>[
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height *
-                        0.52, // Ajusta la altura del PageView aquí
-                    child: Stack(
-                      children: <Widget>[
-                        PageView.builder(
-                          controller: _pageController,
-                          itemCount: images.length,
-                          onPageChanged: (int page) {
-                            setState(() {
-                              _currentPage = page;
-                            });
-                          },
-                          itemBuilder: (BuildContext context, int index) {
-                            return Image.network(images[index]);
-                          },
-                        ),
-                        if (_currentPage != 0)
-                          Positioned(
-                            left: 10,
-                            top: MediaQuery.of(context).size.height * 0.3 -
-                                30, // Ajusta la posición vertical de las flechas
-                            child: IconButton(
-                              iconSize: 40,
-                              color: Colors.white,
-                              icon: const Icon(Icons.chevron_left),
-                              onPressed: () {
-                                _pageController.previousPage(
-                                  duration: const Duration(milliseconds: 500),
-                                  curve: Curves.easeInOut,
-                                );
-                              },
-                            ),
-                          ),
-                        if (_currentPage != 2)
-                          Positioned(
-                            right: 10,
-                            top: MediaQuery.of(context).size.height * 0.3 -
-                                30, // Ajusta la posición vertical de las flechas
-                            child: IconButton(
-                              iconSize: 40,
-                              color: Colors.white,
-                              icon: const Icon(Icons.chevron_right),
-                              onPressed: () {
-                                _pageController.nextPage(
-                                  duration: const Duration(milliseconds: 500),
-                                  curve: Curves.easeInOut,
-                                );
-                              },
-                            ),
-                          ),
-                      ],
+                  CarouselSlider(
+                    options: CarouselOptions(
+                      aspectRatio: 1.5,
+                      viewportFraction: 1.0,
+                      onPageChanged: (index, reason) {
+                        setState(() {
+                          _currentPage = index;
+                        });
+                      },
                     ),
+                    items: images.map((image) {
+                      return Builder(
+                        builder: (BuildContext context) {
+                          return Image.asset(
+                            image,
+                            fit: BoxFit.cover,
+                            width: MediaQuery.of(context).size.width,
+                          );
+                        },
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(
+                    height: 15,
                   ),
                   //!Contenedor con el ListView
                   ListView(
@@ -103,28 +75,30 @@ class _HomeState extends State<Home> {
                     children: [
                       Container(
                         color: const Color(0xFF80A6AD),
-                        child: const Padding(
-                          padding: EdgeInsets.all(10.0),
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 'UNA\nMEZCLA DE\nDISEÑO Y\nCOMODIDAD',
                                 style: TextStyle(
-                                  fontSize: 25,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF203040),
+                                  fontSize:
+                                      MediaQuery.of(context).size.width * 0.08,
+                                  color: const Color(0xFF203040),
                                 ),
                               ),
                               Text(
                                 'Crea el espacio \nperfecto',
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize:
+                                      MediaQuery.of(context).size.width * 0.06,
                                   fontWeight: FontWeight.normal,
                                   color: Colors.white,
                                 ),
                               ),
-                              Divider(
+                              const Divider(
                                 color: Color(0xFF607d82),
                                 thickness: 2,
                               ),
@@ -135,7 +109,7 @@ class _HomeState extends State<Home> {
                       const SizedBox(
                         height: 10,
                       ),
-                      const SectionWidget(
+                      SectionWidget(
                         texto: 'DECORACIÓN',
                         rutaNavegacion: CategoryPage(
                           title: 'DECORACIÓN',
@@ -148,7 +122,7 @@ class _HomeState extends State<Home> {
                           rutaImagen: 'images/Silla.jpg',
                         ),
                       ),
-                      const SectionWidget(
+                      SectionWidget(
                           texto: 'COCINA',
                           rutaNavegacion: CategoryPage(
                             title: 'COCINA',
@@ -156,7 +130,7 @@ class _HomeState extends State<Home> {
                       const ItemWidget(
                           rutaImagen: 'images/Cucharas.jpg',
                           rutaNavegacion: Home()),
-                      const SectionWidget(
+                      SectionWidget(
                           texto: 'RECÁMARA',
                           rutaNavegacion: CategoryPage(
                             title: 'RECÁMARA',
@@ -204,8 +178,9 @@ class SectionWidget extends StatelessWidget {
             child: Center(
               child: Text(
                 texto,
-                style: const TextStyle(
-                  fontSize: 30,
+                style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.width *
+                      0.09, // Ajusta este valor para cambiar el tamaño del texto
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
@@ -244,9 +219,14 @@ class ItemWidget extends StatelessWidget {
           },
           child: Stack(
             children: [
-              Image.asset(
-                rutaImagen,
-                fit: BoxFit.cover,
+              Container(
+                height: MediaQuery.of(context).size.height *
+                    0.75, // Ajusta este valor para cambiar la altura
+                width: MediaQuery.of(context).size.width, //
+                child: Image.asset(
+                  rutaImagen,
+                  fit: BoxFit.cover,
+                ),
               ),
               Positioned.fill(
                 child: Container(
@@ -265,8 +245,7 @@ class ItemWidget extends StatelessWidget {
 }
 
 final List<String> images = [
-  'https://hips.hearstapps.com/hmg-prod/images/plantas-de-interior-resistentes-2-1543351859.jpg',
-  'https://hips.hearstapps.com/hmg-prod/images/plantas-de-interior-resistentes-2-1543351859.jpg',
-  'https://hips.hearstapps.com/hmg-prod/images/plantas-de-interior-resistentes-2-1543351859.jpg',
-  //imagenes para probar el PageView
+  'images/Macetas.jpg',
+  'images/Silla2.jpg',
+  'images/Espejo.jpg',
 ];

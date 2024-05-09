@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges;
 import 'home.dart';
+import 'login.dart';
 import 'category.dart';
 
 //! Widget para crear el appbar
@@ -16,9 +17,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      automaticallyImplyLeading: false,
       backgroundColor: Colors.white,
       title: const Text(
-        'ENPUNTO',
+        'MiniDepot',
         style: TextStyle(
           fontWeight: FontWeight.bold,
           color: Color(0xFF405357),
@@ -94,15 +96,21 @@ class CustomDrawer extends StatelessWidget {
             ),
             title: const Text('Entrar'),
             onTap: () {
-              Navigator.pop(context);
+              //ir a la vista login
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const Login(),
+                ),
+              );
             },
           ),
           const CustomListTile(title: 'Inicio', rutaNavegacion: Home()),
-          const CustomListTile(
+          CustomListTile(
               title: 'Deco', rutaNavegacion: CategoryPage(title: 'DECORACIÓN')),
-          const CustomListTile(
+          CustomListTile(
               title: 'Cocina', rutaNavegacion: CategoryPage(title: 'COCINA')),
-          const CustomListTile(
+          CustomListTile(
               title: 'Recámara',
               rutaNavegacion: CategoryPage(title: 'RECÁMARA')),
           const CustomListTile(title: 'Info', rutaNavegacion: Home()),
