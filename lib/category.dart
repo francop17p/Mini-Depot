@@ -13,109 +13,149 @@ class CategoryPage extends StatefulWidget {
 class _CategoryPageState extends State<CategoryPage> {
   final ValueNotifier<int> cartItemCount = ValueNotifier<int>(0);
   String? _selectedPrice;
+  String? _selectedOrder;
+  final List<String> _prices = [
+    'Todos',
+    'Menor a \$500',
+    '\$500 - \$1000',
+    'Mayor a \$1000'
+  ]; // Lista de precios
+
+  final List<String> _orders = [
+    'Ordenar por',
+    'Lo mas nuevo',
+    'Precio (de menor a mayor)',
+    'Precio (de mayor a menor)',
+    'Nombre de A-Z',
+    'Nombre Z-A'
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: const Color(0xFFedeff0),
-        //!AppBar
-        appBar: CustomAppBar(cartItemCount: cartItemCount),
-        //!Menú lateral
-        endDrawer: const CustomDrawer(),
+      backgroundColor: const Color(0xFFedeff0),
+      //!AppBar
+      appBar: CustomAppBar(cartItemCount: cartItemCount),
+      //!Menú lateral
+      endDrawer: const CustomDrawer(),
 
-        //!Cuerpo
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(50, 4, 50, 50),
-            child: ListView(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                Text(
-                  widget.title,
-                  style: const TextStyle(
-                    fontSize: 32,
-                    color: Color(0xFF445467),
-                    fontWeight: FontWeight.bold,
-                  ),
+      //!Cuerpo
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(50, 4, 50, 50),
+          child: ListView(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              Text(
+                widget.title,
+                style: const TextStyle(
+                  fontSize: 32,
+                  color: Color(0xFF445467),
+                  fontWeight: FontWeight.bold,
                 ),
-                const SizedBox(height: 15),
-                Row(
-                  children: [
-                    const Text('Filtrar por precio:'),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: const Text('Filtrar por precio'),
-                                content: DropdownButton<String>(
-                                  value: _selectedPrice,
-                                  onChanged: (String? newValue) {
-                                    setState(() {
-                                      _selectedPrice = newValue;
-                                    });
-                                  },
-                                  items: <String>[
-                                    'Todos',
-                                    'Menor a \$500',
-                                    '\$500 - \$1000',
-                                    'Mayor a \$1000'
-                                  ].map<DropdownMenuItem<String>>(
-                                      (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList(),
-                                ),
-                                actions: [
-                                  TextButton(
-                                    child: const Text('OK'),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        },
-                        child: const Text('Seleccionar'),
+              ),
+              const SizedBox(height: 15),
+              //!Filtros
+              Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    //!Precios
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black, width: 1),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: _selectedPrice,
+                          isExpanded: true,
+                          items: _prices.map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (newValue) {
+                            setState(() {
+                              _selectedPrice = newValue;
+                            });
+                          },
+                          hint: const Center(
+                            child: Text('Filtro'),
+                          ),
+                          iconSize: 0,
+                        ),
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 15),
-                ItemWidget(
-                  rutaImagen: 'images/Silla.jpg',
-                  rutaNavegacion: Item(
-                    previousViewName: widget.title,
-                    //!Cambiar por el nombre de la categoría
-                    rutaImagen: 'images/Silla.jpg',
                   ),
-                ),
-                ItemWidget(
-                  rutaImagen: 'images/Silla.jpg',
-                  rutaNavegacion: Item(
-                    previousViewName: widget.title,
-                    rutaImagen: 'images/silla.jpg',
+                  const SizedBox(
+                    width: 10,
                   ),
-                ),
-                ItemWidget(
-                  rutaImagen: 'images/Silla.jpg',
-                  rutaNavegacion: Item(
-                    previousViewName: widget.title,
-                    rutaImagen: 'images/Silla.jpg',
+                  //!Ordenar por
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black, width: 1),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: _selectedOrder,
+                          isExpanded: true,
+                          items: _orders.map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (newValue) {
+                            setState(() {
+                              _selectedOrder = newValue;
+                            });
+                          },
+                          hint: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.arrow_upward, size: 18),
+                              Icon(Icons.arrow_downward, size: 18),
+                            ],
+                          ),
+                          iconSize: 0,
+                        ),
+                      ),
+                    ),
                   ),
+                ],
+              ),
+              const SizedBox(height: 15),
+              ItemWidget(
+                rutaImagen: 'images/Silla.jpg',
+                rutaNavegacion: Item(
+                  previousViewName: widget.title,
+                  //!Cambiar por el nombre de la categoría
+                  rutaImagen: 'images/Silla.jpg',
                 ),
-              ],
-            ),
+              ),
+              ItemWidget(
+                rutaImagen: 'images/Silla.jpg',
+                rutaNavegacion: Item(
+                  previousViewName: widget.title,
+                  rutaImagen: 'images/silla.jpg',
+                ),
+              ),
+              ItemWidget(
+                rutaImagen: 'images/Silla.jpg',
+                rutaNavegacion: Item(
+                  previousViewName: widget.title,
+                  rutaImagen: 'images/Silla.jpg',
+                ),
+              ),
+            ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 }
 

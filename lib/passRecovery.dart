@@ -66,7 +66,6 @@ class _PassRecoveryState extends State<PassRecovery> {
                   },
                 ),
                 const SizedBox(height: 16.0),
-                //!cambiar color a gris y ponerlo en verde(actual) cuando el captcha se valide y no falten datos
                 SizedBox(
                   width: double.infinity,
                   height: 60,
