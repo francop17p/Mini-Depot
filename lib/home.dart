@@ -1,5 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:proyecto_movil/Managers.dart';
 import 'package:proyecto_movil/category.dart';
+import 'package:proyecto_movil/registroHelper.dart';
 import 'item.dart';
 import 'custom_widgets.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -24,6 +28,21 @@ class _HomeState extends State<Home> {
   final ValueNotifier<int> cartItemCount = ValueNotifier<int>(0);
 
   @override
+  void initState() {
+    super.initState();
+
+    loadCurrentUser();
+  }
+
+  //!Pruebas: borrar al final
+  void loadCurrentUser() async {
+    User? currentUser = auth.currentUser;
+    if (currentUser == null) {
+      print('No hay usuario logueado');
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFedeff0),
@@ -45,6 +64,8 @@ class _HomeState extends State<Home> {
                   CarouselSlider(
                     options: CarouselOptions(
                       aspectRatio: 1.5,
+                      autoPlay: true,
+                      autoPlayInterval: const Duration(seconds: 6),
                       viewportFraction: 1.0,
                       onPageChanged: (index, reason) {
                         setState(() {

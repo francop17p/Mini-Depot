@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_movil/login.dart';
 import 'package:firebase_core_web/firebase_core_web.dart';
+import 'package:proyecto_movil/home.dart';
 
 import 'package:proyecto_movil/registroHelper.dart';
 
@@ -18,6 +19,7 @@ class _RegistroState extends State<Registro> {
   final _formKey = GlobalKey<FormState>();
   String _email = '';
   String _password = '';
+  String _name = '';
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +40,11 @@ class _RegistroState extends State<Registro> {
                     IconButton(
                       icon: const Icon(Icons.arrow_back),
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.pushReplacement(context, MaterialPageRoute(
+                          builder: (context) {
+                            return const Home();
+                          },
+                        ));
                       },
                     ),
                   ],
@@ -74,6 +80,12 @@ class _RegistroState extends State<Registro> {
                   decoration: const InputDecoration(
                     labelText: 'Email',
                   ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, introduce un email';
+                    }
+                    return null;
+                  },
                   onSaved: (value) {
                     _email = value!;
                   },
@@ -84,18 +96,32 @@ class _RegistroState extends State<Registro> {
                     labelText: 'Contraseña',
                   ),
                   obscureText: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, introduce una contraseña';
+                    }
+                    return null;
+                  },
                   onSaved: (value) {
                     _password = value!;
                   },
                 ),
                 const SizedBox(height: 16.0),
-                //!cambiar por captcha
-                CheckboxListTile(
-                  title: const Text('No soy un robot'),
-                  value: false,
-                  onChanged: (value) {},
+                TextFormField(
+                  decoration: const InputDecoration(
+                    labelText: 'Nombre',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, introduce un nombre';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) {
+                    _name = value!;
+                  },
                 ),
-                const SizedBox(height: 16.0),
+                const SizedBox(height: 25.0),
                 //!cambiar color a gris y ponerlo en verde(actual) cuando el captcha se valide y no falten datos
                 SizedBox(
                   width: double.infinity,
@@ -108,43 +134,52 @@ class _RegistroState extends State<Registro> {
                         try {
                           User? user =
                               await authService.createUserWithEmailAndPassword(
-                                  _email, _password);
-                        } on FirebaseException catch (e) {
-                          print(e.message); // Imprime el mensaje de error
+                                  _email, _password, _name);
 
-                          // Aquí puedes manejar el error como mejor te parezca
+                          // Muestra un SnackBar con un mensaje de éxito
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Cuenta creada'),
+                                content:
+                                    Text('La cuenta se creó correctamente.'),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: Text('Cerrar'),
+                                    onPressed: () {
+                                      // Redirige al usuario a la vista de inicio de sesión cuando se cierra el diálogo
+                                      Navigator.of(context).pushReplacement(
+                                        MaterialPageRoute(
+                                            builder: (context) => Login()),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        } on FirebaseAuthException catch (e) {
                           if (e.code == 'email-already-in-use') {
-                            // Si el correo electrónico ya está en uso, muestra un mensaje de error
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                   content: Text(
                                       'Este correo electrónico ya está en uso.')),
                             );
                           } else if (e.code == 'weak-password') {
-                            // Si la contraseña es débil, muestra un mensaje de error
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                   content: Text(
-                                      'La contraseña es demasiado débil.')),
+                                      'La contraseña debe tener minimo 6 caracteres.')),
                             );
                           } else {
-                            // Si se produce otro error, muestra un mensaje de error genérico
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  content: Text(
-                                      'Ocurrió un error al crear la cuenta.')),
+                              SnackBar(content: Text('Correo no valido.')),
                             );
                           }
                         } catch (e) {
-                          // Imprime cualquier otra excepción que no sea una FirebaseException
                           print('Ocurrió una excepción: $e');
                         }
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content:
-                                  Text('Por favor, llena todos los campos.')),
-                        );
                       }
                     },
                     style: ButtonStyle(

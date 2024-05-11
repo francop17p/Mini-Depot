@@ -3,6 +3,8 @@ import 'package:proyecto_movil/home.dart';
 import 'custom_widgets.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:input_quantity/input_quantity.dart';
+import 'package:proyecto_movil/Managers.dart';
+import 'package:provider/provider.dart';
 
 class Item extends StatefulWidget {
   final String previousViewName;
@@ -39,20 +41,6 @@ class _ItemState extends State<Item> {
     Colors.blue: 'Azul',
     // Agrega más nombres de colores aquí
   };
-
-  @override
-  void initState() {
-    super.initState();
-    _cantidadController = TextEditingController(text: '1');
-  }
-
-  late TextEditingController _cantidadController;
-
-  @override
-  void dispose() {
-    _cantidadController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -221,7 +209,12 @@ class _ItemState extends State<Item> {
                 height: MediaQuery.of(context).size.width * 0.08,
                 child: ElevatedButton(
                   onPressed: () {
-                    cartItemCount.value += cantidad;
+                    Provider.of<CartProvider>(context, listen: false)
+                        .addToCart({
+                      'item': 'Título del producto',
+                      'cantidad': cantidad,
+                      // Agrega más información del artículo si es necesario
+                    });
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF607D82),

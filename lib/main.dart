@@ -10,6 +10,8 @@ import 'package:proyecto_movil/login.dart';
 import 'package:proyecto_movil/passRecovery.dart';
 import 'package:proyecto_movil/registro.dart';
 import 'package:proyecto_movil/registroHelper.dart';
+import 'package:provider/provider.dart';
+import 'package:proyecto_movil/Managers.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,22 +19,12 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  AuthService authService = AuthService();
-
-  try {
-    User? user = await authService.createUserWithEmailAndPassword(
-        'aab@gmail.com', '123456');
-
-    if (user != null) {
-      print('Usuario creado con éxito');
-    } else {
-      print('Error al crear el usuario');
-    }
-  } catch (e) {
-    print('Ocurrió una excepción: $e');
-  }
-
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => CartProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -48,13 +40,13 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        // home: const Item(
-        //   previousViewName: 'Inicio',6
-        //   rutaImagen: 'images/silla.jpg',
-        // ));
-        home: CategoryPage(
-          title: "DECORACIÓN",
+        home: const Item(
+          previousViewName: 'Inicio',
+          rutaImagen: 'images/silla.jpg',
         ));
-    // home: const Home(),
+    // home: CategoryPage(
+    //   title: "DECORACIÓN",
+    // ));
+    //home: const Home());
   }
 }

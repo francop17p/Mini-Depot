@@ -1,9 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:provider/provider.dart';
+import 'package:proyecto_movil/Managers.dart';
+import 'package:proyecto_movil/perfil.dart';
 import 'home.dart';
 import 'login.dart';
 import 'category.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+FirebaseAuth auth = FirebaseAuth.instance;
 
 //! Widget para crear el appbar
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -32,12 +38,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       actions: [
         //!Botón del carrito
-        ValueListenableBuilder<int>(
-          valueListenable: cartItemCount,
-          builder: (context, count, child) {
+        Consumer<CartProvider>(
+          builder: (context, cartProvider, child) {
             return badges.Badge(
               badgeContent: Text(
-                count.toString(),
+                cartProvider.cartItems.length.toString(),
                 style: const TextStyle(color: Colors.white),
               ),
               badgeStyle: badges.BadgeStyle(badgeColor: Colors.blue.shade300),
@@ -47,7 +52,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               child: IconButton(
                 icon: const Icon(Icons.shopping_cart),
                 onPressed: () {
-                  // Acción del botón del carrito
+                  Provider.of<CartProvider>(context, listen: false).clearCart();
                 },
               ),
             );
@@ -70,7 +75,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
 //! Widget para crear el menú lateral
 class CustomDrawer extends StatelessWidget {
-  const CustomDrawer({super.key});
+  const CustomDrawer({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -83,25 +90,42 @@ class CustomDrawer extends StatelessWidget {
               Navigator.of(context).pop();
             },
           ),
-          //!Icono Entrar
-          ListTile(
-            leading: const CircleAvatar(
-              radius: 10,
-              backgroundColor: Color(0xFF607D82),
-              child: Icon(
-                color: Colors.white,
-                Icons.person,
-                size: 15,
-              ),
-            ),
-            title: const Text('Entrar'),
-            onTap: () {
-              //ir a la vista login
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const Login(),
+          //!Icono Loguearse o Perfil
+          StreamBuilder<User?>(
+            stream: FirebaseAuth.instance.authStateChanges(),
+            builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
+              return ListTile(
+                leading: const CircleAvatar(
+                  radius: 10,
+                  backgroundColor: Color(0xFF607D82),
+                  child: Icon(
+                    Icons.person,
+                    color: Colors.white,
+                    size: 15,
+                  ),
                 ),
+                title: Text(snapshot.hasData && snapshot.data != null
+                    ? 'Perfil'
+                    : 'Login'),
+                onTap: () {
+                  if (snapshot.hasData && snapshot.data != null) {
+                    // Si hay un usuario registrado, ir a la vista perfil
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const Perfil(),
+                      ),
+                    );
+                  } else {
+                    // Si no hay un usuario registrado, ir a la vista login
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const Login(),
+                      ),
+                    );
+                  }
+                },
               );
             },
           ),
@@ -115,6 +139,33 @@ class CustomDrawer extends StatelessWidget {
               rutaNavegacion: CategoryPage(title: 'RECÁMARA')),
           const CustomListTile(title: 'Info', rutaNavegacion: Home()),
           const CustomListTile(title: 'Contacto', rutaNavegacion: Home()),
+          StreamBuilder<User?>(
+            stream: FirebaseAuth.instance.authStateChanges(),
+            builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
+              if (snapshot.hasData && snapshot.data != null) {
+                // Si hay un usuario registrado, muestra el botón de cierre de sesión
+                return ListTile(
+                  leading: const Icon(Icons.logout),
+                  title: const Text('Cerrar sesión'),
+                  onTap: () {
+                    FirebaseAuth.instance.signOut();
+                    // Navega a la página de inicio
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => Home()),
+                    );
+                    // Muestra un mensaje
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Has cerrado sesión')),
+                    );
+                  },
+                );
+              } else {
+                // Si no hay un usuario registrado, no muestra nada
+                return Container();
+              }
+            },
+          ),
         ],
       ),
     );
