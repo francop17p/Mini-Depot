@@ -302,7 +302,9 @@ class _ItemState extends State<Item> {
                     ),
                   ],
                 ),
-              )
+              ),
+              const SizedBox(height: 20),
+              CustomFooter(), // footer
             ]),
           ),
         ));

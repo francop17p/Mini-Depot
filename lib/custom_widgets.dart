@@ -195,3 +195,105 @@ class CustomListTile extends StatelessWidget {
     );
   }
 }
+
+class CustomFooter extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      color: const Color(0xFF607D82),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Text(
+                    'Contáctanos',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    '1-800-000-0000',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  Text(
+                    'info@misitio.com',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Aceptamos',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                  SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Image.asset(
+                        'images/visa.png', // Asegúrate de tener estas imágenes en tu carpeta de assets
+                        height: 30,
+                      ),
+                      SizedBox(width: 8),
+                      Image.asset(
+                        'images/paypal.png',
+                        height: 30,
+                      ),
+                      SizedBox(width: 8),
+                      Image.asset(
+                        'images/amex.png',
+                        height: 30,
+                      ),
+                      SizedBox(width: 8),
+                      Image.asset(
+                        'images/mastercard.png',
+                        height: 30,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.facebook, color: Colors.white),
+                    onPressed: () {},
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.facebook, color: Colors.white),
+                    onPressed: () {},
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.facebook, color: Colors.white),
+                    onPressed: () {},
+                  ),
+                ],
+              ),
+              const Text(
+                'Política de Privacidad',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            '¡CHATEA CON NOSOTROS!',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
+}

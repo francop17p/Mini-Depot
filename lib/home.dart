@@ -30,7 +30,6 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-
     loadCurrentUser();
   }
 
@@ -51,7 +50,6 @@ class _HomeState extends State<Home> {
 
       //!Menú lateral
       endDrawer: const CustomDrawer(),
-
       //!Cuerpo
       body: SingleChildScrollView(
         child: Column(
@@ -161,6 +159,8 @@ class _HomeState extends State<Home> {
                           rutaNavegacion: Home()),
                     ],
                   ),
+                  const SizedBox(height: 20),
+                  CustomFooter(), // footer
                 ],
               ),
             ),

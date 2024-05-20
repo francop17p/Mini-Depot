@@ -151,6 +151,8 @@ class _CategoryPageState extends State<CategoryPage> {
                   rutaImagen: 'images/Silla.jpg',
                 ),
               ),
+              const SizedBox(height: 20),
+              CustomFooter(), // footer
             ],
           ),
         ),
