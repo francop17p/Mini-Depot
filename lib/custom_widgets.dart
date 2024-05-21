@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:provider/provider.dart';
 import 'package:proyecto_movil/Managers.dart';
@@ -8,6 +9,7 @@ import 'home.dart';
 import 'login.dart';
 import 'category.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'info.dart';
 
 FirebaseAuth auth = FirebaseAuth.instance;
 
@@ -137,7 +139,7 @@ class CustomDrawer extends StatelessWidget {
           CustomListTile(
               title: 'Recámara',
               rutaNavegacion: CategoryPage(title: 'RECÁMARA')),
-          const CustomListTile(title: 'Info', rutaNavegacion: Home()),
+          const CustomListTile(title: 'Info', rutaNavegacion: InfoPage()),
           const CustomListTile(title: 'Contacto', rutaNavegacion: Home()),
           StreamBuilder<User?>(
             stream: FirebaseAuth.instance.authStateChanges(),
@@ -237,7 +239,7 @@ class CustomFooter extends StatelessWidget {
                   Row(
                     children: [
                       Image.asset(
-                        'images/visa.png', // Asegúrate de tener estas imágenes en tu carpeta de assets
+                        'images/visa.png',
                         height: 30,
                       ),
                       SizedBox(width: 8),
@@ -272,11 +274,13 @@ class CustomFooter extends StatelessWidget {
                     onPressed: () {},
                   ),
                   IconButton(
-                    icon: const Icon(Icons.facebook, color: Colors.white),
+                    icon: const FaIcon(FontAwesomeIcons.twitter,
+                        color: Colors.white), // Icono de Twitter
                     onPressed: () {},
                   ),
                   IconButton(
-                    icon: const Icon(Icons.facebook, color: Colors.white),
+                    icon: const FaIcon(FontAwesomeIcons.pinterest,
+                        color: Colors.white), // Icono de Pinterest
                     onPressed: () {},
                   ),
                 ],
@@ -284,6 +288,41 @@ class CustomFooter extends StatelessWidget {
               const Text(
                 'Política de Privacidad',
                 style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          // Nueva sección de suscripción
+          const Text(
+            'Únete a nuestra lista de correo',
+            style: TextStyle(color: Colors.white, fontSize: 16),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    hintText: 'Ingresa tu email aquí',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  iconColor: const Color(0xFF405357),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 18,
+                  ),
+                ),
+                child: const Text('Suscríbete'),
               ),
             ],
           ),
