@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'custom_widgets.dart';
+import 'custom_widgets.dart'; // Asegúrate de tener importado custom_widgets.dart donde defines CustomAppBar, CustomDrawer y CustomFooter
 
 class InfoPage extends StatefulWidget {
   const InfoPage({super.key});
@@ -40,7 +40,7 @@ class _InfoPageState extends State<InfoPage> {
               const SizedBox(height: 16),
               Center(
                 child: Image.asset(
-                  'images/Macetas.jpg',
+                  'images/succulents.jpg', // Asegúrate de tener esta imagen en tu carpeta de assets
                   fit: BoxFit.cover,
                   width: MediaQuery.of(context).size.width * 0.8,
                 ),
@@ -67,7 +67,7 @@ class _InfoPageState extends State<InfoPage> {
               const SizedBox(height: 16),
               _buildFaqItem('¿Cuáles son tus opciones de entrega?'),
               const SizedBox(height: 20),
-              CustomFooter(), // footer
+              CustomFooter(), // Agrega el footer aquí
             ],
           ),
         ),
