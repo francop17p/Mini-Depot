@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:badges/badges.dart' as badges;
@@ -77,9 +76,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
 //! Widget para crear el menú lateral
 class CustomDrawer extends StatelessWidget {
-  const CustomDrawer({
-    super.key,
-  });
+  final String previousViewName;
+
+  const CustomDrawer({super.key, required this.previousViewName});
 
   @override
   Widget build(BuildContext context) {
@@ -131,16 +130,39 @@ class CustomDrawer extends StatelessWidget {
               );
             },
           ),
-          const CustomListTile(title: 'Inicio', rutaNavegacion: Home()),
           CustomListTile(
-              title: 'Deco', rutaNavegacion: CategoryPage(title: 'DECORACIÓN')),
+            title: 'Inicio',
+            rutaNavegacion: Home(),
+            previousViewName: previousViewName,
+          ),
           CustomListTile(
-              title: 'Cocina', rutaNavegacion: CategoryPage(title: 'COCINA')),
+            title: 'Deco',
+            rutaNavegacion:
+                CategoryPage(title: 'Deco', previousViewName: previousViewName),
+            previousViewName: previousViewName,
+          ),
           CustomListTile(
-              title: 'Recámara',
-              rutaNavegacion: CategoryPage(title: 'RECÁMARA')),
-          const CustomListTile(title: 'Info', rutaNavegacion: InfoPage()),
-          const CustomListTile(title: 'Contacto', rutaNavegacion: Home()),
+            title: 'Cocina',
+            rutaNavegacion: CategoryPage(
+                title: 'Cocina', previousViewName: previousViewName),
+            previousViewName: previousViewName,
+          ),
+          CustomListTile(
+            title: 'Recámara',
+            rutaNavegacion: CategoryPage(
+                title: 'Recamara', previousViewName: previousViewName),
+            previousViewName: previousViewName,
+          ),
+          CustomListTile(
+            title: 'Info',
+            rutaNavegacion: InfoPage(previousViewName: previousViewName),
+            previousViewName: previousViewName,
+          ),
+          CustomListTile(
+            title: 'Contacto',
+            rutaNavegacion: Home(),
+            previousViewName: previousViewName,
+          ),
           StreamBuilder<User?>(
             stream: FirebaseAuth.instance.authStateChanges(),
             builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
@@ -178,9 +200,14 @@ class CustomDrawer extends StatelessWidget {
 class CustomListTile extends StatelessWidget {
   final String title;
   final Widget rutaNavegacion;
+  final String previousViewName;
 
-  const CustomListTile(
-      {super.key, required this.title, required this.rutaNavegacion});
+  const CustomListTile({
+    super.key,
+    required this.title,
+    required this.rutaNavegacion,
+    required this.previousViewName,
+  });
 
   @override
   Widget build(BuildContext context) {

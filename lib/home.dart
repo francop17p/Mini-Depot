@@ -7,6 +7,7 @@ import 'package:proyecto_movil/registroHelper.dart';
 import 'item.dart';
 import 'custom_widgets.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'product.dart';
 
 void main() {
   runApp(const MaterialApp(
@@ -26,6 +27,16 @@ class _HomeState extends State<Home> {
   int _currentPage = 0;
   final PageController _pageController = PageController(initialPage: 0);
   final ValueNotifier<int> cartItemCount = ValueNotifier<int>(0);
+
+  Future<Product?> fetchProduct(String category) async {
+    var collection = FirebaseFirestore.instance.collection(category);
+    var querySnapshot = await collection.limit(1).get();
+    if (querySnapshot.docs.isNotEmpty) {
+      var doc = querySnapshot.docs.first;
+      return Product.fromMap(doc.data() as Map<String, dynamic>, doc.id);
+    }
+    return null;
+  }
 
   @override
   void initState() {
@@ -49,7 +60,7 @@ class _HomeState extends State<Home> {
       appBar: CustomAppBar(cartItemCount: cartItemCount),
 
       //!Menú lateral
-      endDrawer: const CustomDrawer(),
+      endDrawer: CustomDrawer(previousViewName: 'Inicio'),
       //!Cuerpo
       body: SingleChildScrollView(
         child: Column(
@@ -131,39 +142,86 @@ class _HomeState extends State<Home> {
                       SectionWidget(
                         texto: 'DECORACIÓN',
                         rutaNavegacion: CategoryPage(
-                          title: 'DECORACIÓN',
+                          title: 'Deco',
+                          previousViewName: 'Inicio',
                         ),
                       ),
-                      const ItemWidget(
-                        rutaImagen: 'images/Silla.jpg',
-                        rutaNavegacion: Item(
-                          previousViewName: 'Inicio',
-                          rutaImagen: 'images/Silla.jpg',
-                        ),
+                      FutureBuilder<Product?>(
+                        future: fetchProduct('Deco'),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+                          if (snapshot.hasData) {
+                            Product product = snapshot.data!;
+                            return ItemWidget(
+                              product: product,
+                            );
+                          } else {
+                            return const Text(
+                                'No se encontró producto en la categoría "Deco"');
+                          }
+                        },
                       ),
                       SectionWidget(
                           texto: 'COCINA',
                           rutaNavegacion: CategoryPage(
-                            title: 'COCINA',
+                            title: 'Cocina',
+                            previousViewName: 'Inicio',
                           )),
-                      const ItemWidget(
-                          rutaImagen: 'images/Cucharas.jpg',
-                          rutaNavegacion: Home()),
+                      FutureBuilder<Product?>(
+                        future: fetchProduct('Cocina'),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+                          if (snapshot.hasData) {
+                            Product product = snapshot.data!;
+                            return ItemWidget(
+                              product: product,
+                            );
+                          } else {
+                            return const Text(
+                                'No se encontró producto en la categoría "Cocina"');
+                          }
+                        },
+                      ),
                       SectionWidget(
                           texto: 'RECÁMARA',
                           rutaNavegacion: CategoryPage(
-                            title: 'RECÁMARA',
+                            title: 'Recamara',
+                            previousViewName: 'Inicio',
                           )),
-                      const ItemWidget(
-                          rutaImagen: 'images/Cojín.jpg',
-                          rutaNavegacion: Home()),
+                      FutureBuilder<Product?>(
+                        future: fetchProduct('Recamara'),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+                          if (snapshot.hasData) {
+                            Product product = snapshot.data!;
+                            return ItemWidget(
+                              product: product,
+                            );
+                          } else {
+                            return const Text(
+                                'No se encontró producto en la categoría "Recamara"');
+                          }
+                        },
+                      ),
                     ],
                   ),
                   const SizedBox(height: 20),
-                  CustomFooter(), // footer
                 ],
               ),
             ),
+            CustomFooter(), // footer
           ],
         ),
       ),
@@ -219,11 +277,12 @@ class SectionWidget extends StatelessWidget {
 
 //!Widget para mostrar los items de las secciones
 class ItemWidget extends StatelessWidget {
-  final String rutaImagen;
-  final Widget rutaNavegacion;
+  final Product product;
 
-  const ItemWidget(
-      {super.key, required this.rutaImagen, required this.rutaNavegacion});
+  const ItemWidget({
+    super.key,
+    required this.product,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -234,7 +293,10 @@ class ItemWidget extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => rutaNavegacion,
+                builder: (context) => Item(
+                  previousViewName: 'Inicio',
+                  product: product,
+                ),
               ),
             );
           },
@@ -244,8 +306,8 @@ class ItemWidget extends StatelessWidget {
                 height: MediaQuery.of(context).size.height *
                     0.75, // Ajusta este valor para cambiar la altura
                 width: MediaQuery.of(context).size.width, //
-                child: Image.asset(
-                  rutaImagen,
+                child: Image.network(
+                  product.imageUrl,
                   fit: BoxFit.cover,
                 ),
               ),
@@ -255,6 +317,28 @@ class ItemWidget extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            product.name,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            '\$${product.price}',
+            style: const TextStyle(
+              fontWeight: FontWeight.normal,
+            ),
           ),
         ),
         const SizedBox(
