@@ -5,6 +5,8 @@ import 'package:photo_view/photo_view.dart';
 import 'package:proyecto_movil/Managers.dart';
 import 'package:provider/provider.dart';
 import 'product.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Item extends StatefulWidget {
   final String previousViewName;
@@ -41,16 +43,64 @@ class _ItemState extends State<Item> {
     // Agrega más nombres de colores aquí
   };
 
+  Future<void> _addToCart() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      CollectionReference cartRef = FirebaseFirestore.instance
+          .collection('Usuarios')
+          .doc(user.uid)
+          .collection('Carrito');
+      await cartRef.add({
+        'productId': widget.product.id,
+        'name': widget.product.name,
+        'price': widget.product.price,
+        'imageUrl': widget.product.imageUrl,
+        'cantidad': cantidad,
+        'color': selectedColorName,
+      });
+
+      // Actualizar el conteo del carrito en Firestore
+      DocumentReference userRef =
+          FirebaseFirestore.instance.collection('Usuarios').doc(user.uid);
+      DocumentSnapshot userSnapshot = await userRef.get();
+      if (userSnapshot.exists) {
+        int currentCartCount = userSnapshot.get('cartCount') ?? 0;
+        userRef.update({'cartCount': currentCartCount + cantidad});
+      } else {
+        userRef.set({'cartCount': cantidad});
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Producto añadido al carrito')),
+      );
+      _loadCartItemCount();
+    }
+  }
+
+  Future<void> _loadCartItemCount() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentReference userRef =
+          FirebaseFirestore.instance.collection('Usuarios').doc(user.uid);
+      DocumentSnapshot userSnapshot = await userRef.get();
+      if (userSnapshot.exists) {
+        cartItemCount.value = userSnapshot.get('cartCount') ?? 0;
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCartItemCount();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFedeff0),
-      //!AppBar
       appBar: CustomAppBar(cartItemCount: cartItemCount),
-
-      //!Menú lateral
-      endDrawer: const CustomDrawer(previousViewName: 'item'),
-      //!Cuerpo
+      endDrawer: CustomDrawer(previousViewName: 'Item'),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,7 +115,6 @@ class _ItemState extends State<Item> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  //!Volver a la vista anterior
                   GestureDetector(
                     onTap: () {
                       Navigator.pop(context);
@@ -85,10 +134,7 @@ class _ItemState extends State<Item> {
                       ],
                     ),
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  //!Ampliar imagen al hacer clic
+                  const SizedBox(height: 20),
                   GestureDetector(
                     onTap: () {
                       showDialog(
@@ -102,8 +148,7 @@ class _ItemState extends State<Item> {
                                 imageProvider:
                                     NetworkImage(widget.product.imageUrl),
                                 backgroundDecoration: const BoxDecoration(
-                                  color: Colors.transparent,
-                                ),
+                                    color: Colors.transparent),
                               ),
                               Container(
                                 decoration: const BoxDecoration(
@@ -111,10 +156,8 @@ class _ItemState extends State<Item> {
                                   shape: BoxShape.circle,
                                 ),
                                 child: IconButton(
-                                  icon: const Icon(
-                                    Icons.close,
-                                    color: Colors.black,
-                                  ),
+                                  icon: const Icon(Icons.close,
+                                      color: Colors.black),
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                   },
@@ -132,36 +175,25 @@ class _ItemState extends State<Item> {
                       ),
                     ),
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
                   Text(
                     'SKU: ${widget.product.id}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.normal,
-                    ),
+                    style: const TextStyle(fontWeight: FontWeight.normal),
                   ),
                   Text(
                     widget.product.name,
                     style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                        fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   Text(
                     '\$${widget.product.price}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.normal,
-                    ),
+                    style: const TextStyle(fontWeight: FontWeight.normal),
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
                   Text('Color: $selectedColorName'),
-                  //!Muestra los círculos de colores
                   Wrap(
-                    spacing: 10.0, // Espaciado horizontal entre los círculos
-                    runSpacing: 10.0, // Espaciado vertical entre las filas
+                    spacing: 10.0,
+                    runSpacing: 10.0,
                     children: colors.map((color) {
                       return CircleItem(
                         color: color,
@@ -176,14 +208,9 @@ class _ItemState extends State<Item> {
                       );
                     }).toList(),
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  //!selector de cantidad
+                  const SizedBox(height: 20),
                   const Text('Cantidad:'),
-                  const SizedBox(
-                    height: 10,
-                  ),
+                  const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -209,36 +236,25 @@ class _ItemState extends State<Item> {
                       ),
                     ],
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  //!Botón de agregar al carrito
+                  const SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
                     height: MediaQuery.of(context).size.width * 0.08,
                     child: ElevatedButton(
-                      onPressed: () {
-                        Provider.of<CartProvider>(context, listen: false)
-                            .addToCart({
-                          'item': widget.product.name,
-                          'cantidad': cantidad,
-                          // Agrega más información del artículo si es necesario
-                        });
-                      },
+                      onPressed: _addToCart,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF607D82),
                         shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(0)),
                         ),
                       ),
-                      child: const Text('Agregar al carrito',
-                          style: TextStyle(color: Colors.white)),
+                      child: const Text(
+                        'Agregar al carrito',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                   ),
-                  //!Botón de comprar
-                  const SizedBox(
-                    height: 10,
-                  ),
+                  const SizedBox(height: 10),
                   SizedBox(
                     width: double.infinity,
                     height: MediaQuery.of(context).size.width * 0.08,
@@ -252,18 +268,15 @@ class _ItemState extends State<Item> {
                           borderRadius: BorderRadius.all(Radius.circular(0)),
                         ),
                       ),
-                      child: const Text('Realizar compra',
-                          style: TextStyle(color: Colors.white)),
+                      child: const Text(
+                        'Realizar compra',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
                   Text('Descripción del producto.'),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  //!Información del producto
+                  const SizedBox(height: 20),
                   Theme(
                     data: Theme.of(context)
                         .copyWith(dividerColor: Colors.transparent),
@@ -285,10 +298,7 @@ class _ItemState extends State<Item> {
                       ],
                     ),
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  //!Política de devolución y reembolso
+                  const SizedBox(height: 20),
                   Theme(
                     data: Theme.of(context)
                         .copyWith(dividerColor: Colors.transparent),
@@ -314,7 +324,7 @@ class _ItemState extends State<Item> {
                 ],
               ),
             ),
-            CustomFooter(), // footer
+            CustomFooter(), // Mueve el footer aquí, pero fuera del padding
           ],
         ),
       ),

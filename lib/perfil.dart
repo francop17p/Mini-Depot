@@ -7,6 +7,7 @@ import 'custom_widgets.dart';
 import 'home.dart';
 import 'dart:typed_data';
 import 'dart:io';
+import 'main.dart'; // Asegúrate de importar donde tengas el routeObserver
 
 class Perfil extends StatefulWidget {
   const Perfil({super.key});
@@ -15,7 +16,7 @@ class Perfil extends StatefulWidget {
   State<Perfil> createState() => _PerfilState();
 }
 
-class _PerfilState extends State<Perfil> {
+class _PerfilState extends State<Perfil> with RouteAware {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -30,6 +31,27 @@ class _PerfilState extends State<Perfil> {
   void initState() {
     super.initState();
     _loadUserData();
+    _loadCartItemCount();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    _loadCartItemCount();
   }
 
   //! Carga los datos del usuario desde Firestore
@@ -135,6 +157,18 @@ class _PerfilState extends State<Perfil> {
         const SnackBar(
             content: Text('No image selected or error in reading file')),
       );
+    }
+  }
+
+  Future<void> _loadCartItemCount() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentReference userRef =
+          FirebaseFirestore.instance.collection('Usuarios').doc(user.uid);
+      DocumentSnapshot userSnapshot = await userRef.get();
+      if (userSnapshot.exists) {
+        cartItemCount.value = userSnapshot.get('cartCount') ?? 0;
+      }
     }
   }
 

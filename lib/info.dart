@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'custom_widgets.dart'; // Asegúrate de tener importado custom_widgets.dart donde defines CustomAppBar, CustomDrawer y CustomFooter
+import 'custom_widgets.dart';
 
 class InfoPage extends StatefulWidget {
   final String previousViewName;
@@ -12,6 +14,25 @@ class InfoPage extends StatefulWidget {
 
 class _InfoPageState extends State<InfoPage> {
   final ValueNotifier<int> cartItemCount = ValueNotifier<int>(0);
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCartItemCount();
+  }
+
+  //! Cargar el conteo de elementos en el carrito desde Firestore
+  Future<void> _loadCartItemCount() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentReference userRef =
+          FirebaseFirestore.instance.collection('Usuarios').doc(user.uid);
+      DocumentSnapshot userSnapshot = await userRef.get();
+      if (userSnapshot.exists) {
+        cartItemCount.value = userSnapshot.get('cartCount') ?? 0;
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

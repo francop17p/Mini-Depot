@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'custom_widgets.dart';
 import 'item.dart';
 import 'product.dart';
+import 'main.dart'; // Asegúrate de importar donde tengas el routeObserver
 
 class CategoryPage extends StatefulWidget {
   CategoryPage(
@@ -14,7 +16,7 @@ class CategoryPage extends StatefulWidget {
   State<CategoryPage> createState() => _CategoryPageState();
 }
 
-class _CategoryPageState extends State<CategoryPage> {
+class _CategoryPageState extends State<CategoryPage> with RouteAware {
   final ValueNotifier<int> cartItemCount = ValueNotifier<int>(0);
   String? _selectedPrice;
   String? _selectedOrder;
@@ -33,6 +35,44 @@ class _CategoryPageState extends State<CategoryPage> {
     'Nombre de A-Z',
     'Nombre Z-A'
   ];
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    _loadCartItemCount();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCartItemCount();
+  }
+
+  Future<void> _loadCartItemCount() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentReference userRef =
+          FirebaseFirestore.instance.collection('Usuarios').doc(user.uid);
+      DocumentSnapshot userSnapshot = await userRef.get();
+      if (userSnapshot.exists) {
+        cartItemCount.value = userSnapshot.get('cartCount') ?? 0;
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

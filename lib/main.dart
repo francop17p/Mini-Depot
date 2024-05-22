@@ -13,6 +13,8 @@ import 'package:proyecto_movil/registroHelper.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_movil/Managers.dart';
 
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -34,6 +36,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        navigatorObservers: [routeObserver],
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(

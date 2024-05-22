@@ -3,12 +3,15 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:provider/provider.dart';
 import 'package:proyecto_movil/Managers.dart';
+import 'package:proyecto_movil/contact.dart';
 import 'package:proyecto_movil/perfil.dart';
 import 'home.dart';
 import 'login.dart';
 import 'category.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'info.dart';
+import 'cart.dart';
+import 'contact.dart';
 
 FirebaseAuth auth = FirebaseAuth.instance;
 
@@ -39,11 +42,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       actions: [
         //!Botón del carrito
-        Consumer<CartProvider>(
-          builder: (context, cartProvider, child) {
+        ValueListenableBuilder<int>(
+          valueListenable: cartItemCount,
+          builder: (context, count, child) {
             return badges.Badge(
               badgeContent: Text(
-                cartProvider.cartItems.length.toString(),
+                count.toString(),
                 style: const TextStyle(color: Colors.white),
               ),
               badgeStyle: badges.BadgeStyle(badgeColor: Colors.blue.shade300),
@@ -53,7 +57,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               child: IconButton(
                 icon: const Icon(Icons.shopping_cart),
                 onPressed: () {
-                  Provider.of<CartProvider>(context, listen: false).clearCart();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CartPage(
+                        previousViewName: 'Carrito',
+                      ),
+                    ),
+                  ); // Navegar al carrito
                 },
               ),
             );
@@ -160,7 +171,7 @@ class CustomDrawer extends StatelessWidget {
           ),
           CustomListTile(
             title: 'Contacto',
-            rutaNavegacion: Home(),
+            rutaNavegacion: ContactPage(previousViewName: previousViewName),
             previousViewName: previousViewName,
           ),
           StreamBuilder<User?>(

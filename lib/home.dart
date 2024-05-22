@@ -8,6 +8,7 @@ import 'item.dart';
 import 'custom_widgets.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'product.dart';
+import 'main.dart'; // Asegúrate de importar donde tengas el routeObserver
 
 void main() {
   runApp(const MaterialApp(
@@ -23,7 +24,7 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with RouteAware {
   int _currentPage = 0;
   final PageController _pageController = PageController(initialPage: 0);
   final ValueNotifier<int> cartItemCount = ValueNotifier<int>(0);
@@ -42,9 +43,41 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     loadCurrentUser();
+    _loadCartItemCount();
   }
 
-  //!Pruebas: borrar al final
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    _loadCartItemCount();
+  }
+
+  Future<void> _loadCartItemCount() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentReference userRef =
+          FirebaseFirestore.instance.collection('Usuarios').doc(user.uid);
+      DocumentSnapshot userSnapshot = await userRef.get();
+      if (userSnapshot.exists) {
+        cartItemCount.value = userSnapshot.get('cartCount') ?? 0;
+      }
+    }
+  }
+
   void loadCurrentUser() async {
     User? currentUser = auth.currentUser;
     if (currentUser == null) {
