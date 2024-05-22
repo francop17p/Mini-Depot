@@ -1,9 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:proyecto_movil/login.dart';
-import 'package:firebase_core_web/firebase_core_web.dart';
 import 'package:proyecto_movil/home.dart';
-
 import 'package:proyecto_movil/registroHelper.dart';
 
 AuthService authService = AuthService();

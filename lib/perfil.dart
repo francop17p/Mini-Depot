@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'custom_widgets.dart';
 import 'home.dart';
 import 'dart:typed_data';
+import 'dart:io';
 
 class Perfil extends StatefulWidget {
   const Perfil({super.key});
@@ -75,48 +76,49 @@ class _PerfilState extends State<Perfil> {
   }
 
   Future<void> _pickImage() async {
-    final result = await FilePicker.platform.pickFiles(type: FileType.image);
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      withReadStream: true, // Ensure this is true
+    );
 
-    if (result != null) {
+    if (result != null && result.files.single.path != null) {
       setState(() {
         _isLoading = true;
       });
 
+      User? user = FirebaseAuth.instance.currentUser;
+      String fileName = result.files.single.name;
+      File file = File(result.files.single.path!);
+
       try {
-        User? user = FirebaseAuth.instance.currentUser;
-        if (user != null) {
-          Uint8List? fileBytes = result.files.single.bytes;
-          String fileName = result.files.single.name;
+        Reference storageRef = FirebaseStorage.instance
+            .ref()
+            .child('profile_images/${user?.uid}/$fileName');
 
-          Reference storageRef = FirebaseStorage.instance
-              .ref()
-              .child('profile_images')
-              .child(user.uid)
-              .child(fileName);
+        UploadTask uploadTask = storageRef.putFile(file);
 
-          UploadTask uploadTask = storageRef.putData(fileBytes!);
-          TaskSnapshot taskSnapshot = await uploadTask;
-          String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+        final TaskSnapshot downloadUrl = await uploadTask;
+        String url = await downloadUrl.ref.getDownloadURL();
 
-          setState(() {
-            _profileImageUrl = downloadUrl;
-            _isLoading = false;
-          });
+        setState(() {
+          _profileImageUrl = url;
+          _isLoading = false;
+        });
 
-          await FirebaseFirestore.instance
-              .collection('Usuarios')
-              .doc(user.uid)
-              .update({
-            'profileImageUrl': _profileImageUrl,
-          });
+        await FirebaseFirestore.instance
+            .collection('Usuarios')
+            .doc(user?.uid)
+            .update({
+          'profileImageUrl': _profileImageUrl,
+        });
 
-          print('Uploaded profile image URL: $_profileImageUrl');
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Foto de perfil actualizada')),
-          );
-        }
-      } catch (e) {
+        print('Uploaded profile image URL: $_profileImageUrl');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Foto de perfil actualizada')),
+        );
+      } catch (e, stackTrace) {
+        print('Error al subir la imagen: $e');
+        print('Stacktrace: $stackTrace');
         setState(() {
           _isLoading = false;
         });
@@ -125,9 +127,11 @@ class _PerfilState extends State<Perfil> {
         );
       }
     } else {
-      setState(() {
-        _isLoading = false;
-      });
+      print('No image selected or file read error.');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('No image selected or error in reading file')),
+      );
     }
   }
 

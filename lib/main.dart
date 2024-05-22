@@ -40,10 +40,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: const Item(
-          previousViewName: 'Inicio',
-          rutaImagen: 'images/silla.jpg',
-        ));
+        home: const Home());
     // home: CategoryPage(
     //   title: "DECORACIÓN",
     // ));
