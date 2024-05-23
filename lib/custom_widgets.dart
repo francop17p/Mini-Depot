@@ -12,6 +12,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'info.dart';
 import 'cart.dart';
 import 'contact.dart';
+import 'orders.dart';
 
 FirebaseAuth auth = FirebaseAuth.instance;
 
@@ -102,7 +103,6 @@ class CustomDrawer extends StatelessWidget {
               Navigator.of(context).pop();
             },
           ),
-          //!Icono Loguearse o Perfil
           StreamBuilder<User?>(
             stream: FirebaseAuth.instance.authStateChanges(),
             builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
@@ -121,7 +121,6 @@ class CustomDrawer extends StatelessWidget {
                     : 'Login'),
                 onTap: () {
                   if (snapshot.hasData && snapshot.data != null) {
-                    // Si hay un usuario registrado, ir a la vista perfil
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -129,7 +128,6 @@ class CustomDrawer extends StatelessWidget {
                       ),
                     );
                   } else {
-                    // Si no hay un usuario registrado, ir a la vista login
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -174,29 +172,30 @@ class CustomDrawer extends StatelessWidget {
             rutaNavegacion: ContactPage(previousViewName: previousViewName),
             previousViewName: previousViewName,
           ),
+          CustomListTile(
+            title: 'Pedidos',
+            rutaNavegacion: OrdersPage(previousViewName: previousViewName),
+            previousViewName: previousViewName,
+          ),
           StreamBuilder<User?>(
             stream: FirebaseAuth.instance.authStateChanges(),
             builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
               if (snapshot.hasData && snapshot.data != null) {
-                // Si hay un usuario registrado, muestra el botón de cierre de sesión
                 return ListTile(
                   leading: const Icon(Icons.logout),
                   title: const Text('Cerrar sesión'),
                   onTap: () {
                     FirebaseAuth.instance.signOut();
-                    // Navega a la página de inicio
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => Home()),
                     );
-                    // Muestra un mensaje
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Has cerrado sesión')),
                     );
                   },
                 );
               } else {
-                // Si no hay un usuario registrado, no muestra nada
                 return Container();
               }
             },

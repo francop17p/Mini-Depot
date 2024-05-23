@@ -1,11 +1,10 @@
+// Modificaciones en CartPage para añadir pedidos a "orders"
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'custom_widgets.dart';
 import 'Managers.dart';
-import 'item.dart';
-import 'product.dart';
 
 class CartPage extends StatefulWidget {
   final String previousViewName;
@@ -27,28 +26,19 @@ class _CartPageState extends State<CartPage> {
           .instance
           .collection('Usuarios')
           .doc(user.uid)
-          .collection('Carrito') as CollectionReference<Map<String, dynamic>>;
+          .collection('Carrito');
       QuerySnapshot<Map<String, dynamic>> cartSnapshot = await cartRef.get();
       return cartSnapshot.docs;
     }
     return [];
   }
 
-  Future<void> _updateCartCount() async {
+  Future<void> _updateCartCount(int count) async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      CollectionReference<Map<String, dynamic>> cartRef = FirebaseFirestore
-          .instance
-          .collection('Usuarios')
-          .doc(user.uid)
-          .collection('Carrito') as CollectionReference<Map<String, dynamic>>;
-      QuerySnapshot<Map<String, dynamic>> cartSnapshot = await cartRef.get();
-      int itemCount = cartSnapshot.docs
-          .fold(0, (count, doc) => count + doc.data()['cantidad'] as int);
       DocumentReference userRef =
           FirebaseFirestore.instance.collection('Usuarios').doc(user.uid);
-      userRef.update({'cartCount': itemCount});
-      cartItemCount.value = itemCount;
+      userRef.update({'cartCount': count});
     }
   }
 
@@ -59,13 +49,7 @@ class _CartPageState extends State<CartPage> {
     } else {
       await cartItemRef.delete();
     }
-    await _updateCartCount();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadCartItemCount();
+    await _loadCartItemCount();
   }
 
   Future<void> _loadCartItemCount() async {
@@ -78,6 +62,56 @@ class _CartPageState extends State<CartPage> {
         cartItemCount.value = userSnapshot.get('cartCount') ?? 0;
       }
     }
+  }
+
+  Future<void> _placeOrder() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      CollectionReference<Map<String, dynamic>> cartRef = FirebaseFirestore
+          .instance
+          .collection('Usuarios')
+          .doc(user.uid)
+          .collection('Carrito');
+      QuerySnapshot<Map<String, dynamic>> cartSnapshot = await cartRef.get();
+      List<Map<String, dynamic>> cartItems = cartSnapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
+
+      if (cartItems.isNotEmpty) {
+        CollectionReference ordersRef = FirebaseFirestore.instance
+            .collection('Usuarios')
+            .doc(user.uid)
+            .collection('orders');
+
+        await ordersRef.add({
+          'items': cartItems,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+
+        // Clear the cart
+        for (var doc in cartSnapshot.docs) {
+          await doc.reference.delete();
+        }
+
+        // Update cart count
+        await _updateCartCount(0);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Compra finalizada y pedidos registrados')),
+        );
+
+        setState(() {
+          cartItemCount.value = 0;
+        });
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCartItemCount();
   }
 
   @override
@@ -237,9 +271,7 @@ class _CartPageState extends State<CartPage> {
                         width: double.infinity,
                         height: 50,
                         child: ElevatedButton(
-                          onPressed: () {
-                            // Acción del botón "Finalizar compra"
-                          },
+                          onPressed: _placeOrder,
                           style: ElevatedButton.styleFrom(
                             foregroundColor: const Color(0xFF607D82),
                             shape: const RoundedRectangleBorder(
