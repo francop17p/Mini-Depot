@@ -1,15 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:proyecto_movil/category.dart';
+import 'package:flutter/services.dart';
 import 'package:proyecto_movil/firebase_options.dart';
 import 'package:proyecto_movil/home.dart';
-import 'package:proyecto_movil/item.dart';
-import 'package:proyecto_movil/login.dart';
-import 'package:proyecto_movil/passRecovery.dart';
-import 'package:proyecto_movil/registro.dart';
-import 'package:proyecto_movil/registroHelper.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_movil/Managers.dart';
 
@@ -20,6 +13,12 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Establecer la orientación solo en vertical
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
 
   runApp(
     ChangeNotifierProvider(
@@ -44,9 +43,5 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         home: const Home());
-    // home: CategoryPage(
-    //   title: "DECORACIÓN",
-    // ));
-    //home: const Home());
   }
 }

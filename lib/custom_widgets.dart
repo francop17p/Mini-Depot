@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:badges/badges.dart' as badges;
-import 'package:provider/provider.dart';
-import 'package:proyecto_movil/Managers.dart';
 import 'package:proyecto_movil/contact.dart';
 import 'package:proyecto_movil/perfil.dart';
 import 'home.dart';
@@ -11,7 +9,6 @@ import 'category.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'info.dart';
 import 'cart.dart';
-import 'contact.dart';
 import 'orders.dart';
 
 FirebaseAuth auth = FirebaseAuth.instance;
@@ -235,6 +232,7 @@ class CustomListTile extends StatelessWidget {
   }
 }
 
+//!Pie de pagina
 class CustomFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -341,25 +339,49 @@ class CustomFooter extends StatelessWidget {
                 child: TextField(
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: Colors.transparent,
                     hintText: 'Ingresa tu email aquí',
+                    hintStyle: const TextStyle(
+                        color: Colors.white), // Color del texto de sugerencia
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5.0),
+                      borderRadius: BorderRadius.circular(0),
+                      borderSide: const BorderSide(
+                          color: Colors.white), // Color del borde
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(0),
+                      borderSide: const BorderSide(
+                          color: Colors
+                              .white), // Color del borde cuando está habilitado
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(0),
+                      borderSide: const BorderSide(
+                          color: Colors
+                              .white), // Color del borde cuando está enfocado
                     ),
                   ),
+                  style: const TextStyle(
+                      color: Colors.white), // Color del texto ingresado
                 ),
               ),
               const SizedBox(width: 10),
               ElevatedButton(
                 onPressed: () {},
                 style: ElevatedButton.styleFrom(
-                  iconColor: const Color(0xFF405357),
+                  backgroundColor: const Color(0xFF405357),
+                  foregroundColor: Colors.white,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(0)),
+                  ),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
                     vertical: 18,
                   ),
                 ),
-                child: const Text('Suscríbete'),
+                child: const Text(
+                  'Suscríbete',
+                ),
               ),
             ],
           ),

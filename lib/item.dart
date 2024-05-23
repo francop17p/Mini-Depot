@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto_movil/home.dart';
 import 'custom_widgets.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:proyecto_movil/Managers.dart';
-import 'package:provider/provider.dart';
 import 'product.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'cart.dart';
 
 class Item extends StatefulWidget {
   final String previousViewName;
@@ -33,14 +31,12 @@ class _ItemState extends State<Item> {
     Colors.red,
     Colors.green,
     Colors.blue,
-    // Agrega más colores aquí
   ];
 
   final Map<Color, String> colorNames = {
     Colors.red: 'Rojo',
     Colors.green: 'Verde',
     Colors.blue: 'Azul',
-    // Agrega más nombres de colores aquí
   };
 
   Future<void> _addToCart() async {
@@ -74,6 +70,12 @@ class _ItemState extends State<Item> {
         const SnackBar(content: Text('Producto añadido al carrito')),
       );
       _loadCartItemCount();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content:
+                Text('Debes iniciar sesión para agregar productos al carrito')),
+      );
     }
   }
 
@@ -260,7 +262,23 @@ class _ItemState extends State<Item> {
                     height: MediaQuery.of(context).size.width * 0.08,
                     child: ElevatedButton(
                       onPressed: () {
-                        // Acción del botón
+                        User? user = FirebaseAuth.instance.currentUser;
+                        if (user != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CartPage(
+                                previousViewName: 'Item',
+                              ),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text(
+                                    'Debes iniciar sesión para realizar una compra')),
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,

@@ -49,6 +49,19 @@ class _OrdersPageState extends State<OrdersPage> {
     return [];
   }
 
+  Future<void> _deleteOrder(String orderId) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      CollectionReference<Map<String, dynamic>> ordersRef = FirebaseFirestore
+          .instance
+          .collection('Usuarios')
+          .doc(user.uid)
+          .collection('orders');
+      await ordersRef.doc(orderId).delete();
+      setState(() {}); // Actualiza la interfaz después de eliminar el pedido
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -118,12 +131,25 @@ class _OrdersPageState extends State<OrdersPage> {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                'Pedido ${index + 1}',
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Pedido ${index + 1}',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete,
+                                        color: Colors.red),
+                                    onPressed: () {
+                                      _deleteOrder(order.id);
+                                    },
+                                  ),
+                                ],
                               ),
                               ListView.builder(
                                 shrinkWrap: true,

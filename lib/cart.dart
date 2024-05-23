@@ -1,10 +1,8 @@
 // Modificaciones en CartPage para añadir pedidos a "orders"
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'custom_widgets.dart';
-import 'Managers.dart';
 
 class CartPage extends StatefulWidget {
   final String previousViewName;

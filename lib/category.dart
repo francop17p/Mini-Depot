@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'custom_widgets.dart';
 import 'item.dart';
 import 'product.dart';
-import 'main.dart'; // Asegúrate de importar donde tengas el routeObserver
+import 'main.dart';
 
 class CategoryPage extends StatefulWidget {
   CategoryPage(
