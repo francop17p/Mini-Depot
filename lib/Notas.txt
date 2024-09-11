@@ -1,4 +1,6 @@
 Home: (appbar) Agregar una separación entre el titulo y el subrayado
 Home: Cambiar las rutas del appbar e imagenes de items
+custom_widgets: Unir el appbar y el drawer en uno solo
+Modificar los tamaños en base a el tamaño de la pantalla
 
 en la clase custom_widgets se pondrán las clases compartidas entre vistas

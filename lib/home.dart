@@ -1,6 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:proyecto_movil/category.dart';
 import 'item.dart';
 import 'custom_widgets.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'product.dart';
+import 'main.dart';
 
 void main() {
   runApp(const MaterialApp(
@@ -16,10 +22,68 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with RouteAware {
   int _currentPage = 0;
   final PageController _pageController = PageController(initialPage: 0);
   final ValueNotifier<int> cartItemCount = ValueNotifier<int>(0);
+  late Future<List<Product>> _futureProducts;
+
+  Future<List<Product>> fetchProducts() async {
+    List<Product> products = [];
+
+    for (String category in ['Deco', 'Cocina', 'Recamara']) {
+      var collection = FirebaseFirestore.instance.collection(category);
+      var querySnapshot = await collection
+          .limit(10)
+          .get(); // Límite de 5 productos por categoría
+
+      // Iterar sobre todos los documentos obtenidos en la consulta
+      for (var doc in querySnapshot.docs) {
+        products
+            .add(Product.fromMap(doc.data() as Map<String, dynamic>, doc.id));
+      }
+    }
+    return products;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _futureProducts = fetchProducts();
+    _loadCartItemCount();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute) {
+      routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    _loadCartItemCount();
+  }
+
+  Future<void> _loadCartItemCount() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentReference userRef =
+          FirebaseFirestore.instance.collection('Usuarios').doc(user.uid);
+      DocumentSnapshot userSnapshot = await userRef.get();
+      if (userSnapshot.exists) {
+        cartItemCount.value = userSnapshot.get('cartCount') ?? 0;
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,193 +93,144 @@ class _HomeState extends State<Home> {
       appBar: CustomAppBar(cartItemCount: cartItemCount),
 
       //!Menú lateral
-      endDrawer: Drawer(
-        child: ListView(
-          children: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            ListTile(
-              leading: const CircleAvatar(
-                radius: 10,
-                backgroundColor: Color(0xFF607D82),
-                child: Icon(
-                  color: Colors.white,
-                  Icons.person,
-                  size: 15,
-                ),
-              ),
-              title: const Text('Entrar'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            const CustomListTile(title: 'Inicio', rutaNavegacion: Home()),
-            const CustomListTile(title: 'Deco', rutaNavegacion: Home()),
-            const CustomListTile(title: 'Cocina', rutaNavegacion: Home()),
-            const CustomListTile(title: 'Recámara', rutaNavegacion: Home()),
-            const CustomListTile(title: 'Info', rutaNavegacion: Home()),
-            const CustomListTile(title: 'Contacto', rutaNavegacion: Home()),
-          ],
-        ),
-      ),
+      endDrawer: CustomDrawer(previousViewName: 'Inicio'),
       //!Cuerpo
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            //!Contenedor con las imágenes
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-              child: Column(
-                children: <Widget>[
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height *
-                        0.52, // Ajusta la altura del PageView aquí
-                    child: Stack(
-                      children: <Widget>[
-                        PageView.builder(
-                          controller: _pageController,
-                          itemCount: images.length,
-                          onPageChanged: (int page) {
+      body: FutureBuilder<List<Product>>(
+        future: _futureProducts,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No se encontraron productos'));
+          }
+
+          List<Product> products = snapshot.data!;
+
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                //!Contenedor con las imágenes
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                  child: Column(
+                    children: <Widget>[
+                      CarouselSlider(
+                        options: CarouselOptions(
+                          aspectRatio: 1.5,
+                          autoPlay: true,
+                          autoPlayInterval: const Duration(seconds: 6),
+                          viewportFraction: 1.0,
+                          onPageChanged: (index, reason) {
                             setState(() {
-                              _currentPage = page;
+                              _currentPage = index;
                             });
                           },
-                          itemBuilder: (BuildContext context, int index) {
-                            return Image.network(images[index]);
-                          },
                         ),
-                        if (_currentPage != 0)
-                          Positioned(
-                            left: 10,
-                            top: MediaQuery.of(context).size.height * 0.3 -
-                                30, // Ajusta la posición vertical de las flechas
-                            child: IconButton(
-                              iconSize: 40,
-                              color: Colors.white,
-                              icon: const Icon(Icons.chevron_left),
-                              onPressed: () {
-                                _pageController.previousPage(
-                                  duration: const Duration(milliseconds: 500),
-                                  curve: Curves.easeInOut,
-                                );
-                              },
-                            ),
-                          ),
-                        if (_currentPage != 2)
-                          Positioned(
-                            right: 10,
-                            top: MediaQuery.of(context).size.height * 0.3 -
-                                30, // Ajusta la posición vertical de las flechas
-                            child: IconButton(
-                              iconSize: 40,
-                              color: Colors.white,
-                              icon: const Icon(Icons.chevron_right),
-                              onPressed: () {
-                                _pageController.nextPage(
-                                  duration: const Duration(milliseconds: 500),
-                                  curve: Curves.easeInOut,
-                                );
-                              },
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                  //!Contenedor con el ListView
-                  ListView(
-                    shrinkWrap: true,
-                    physics:
-                        const NeverScrollableScrollPhysics(), // Deshabilita el scroll en el ListView
-                    children: [
-                      Container(
-                        color: const Color(0xFF80A6AD),
-                        child: const Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'UNA\nMEZCLA DE\nDISEÑO Y\nCOMODIDAD',
-                                style: TextStyle(
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF203040),
-                                ),
-                              ),
-                              Text(
-                                'Crea el espacio \nperfecto',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.normal,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              Divider(
-                                color: Color(0xFF607d82),
-                                thickness: 2,
-                              ),
-                            ],
-                          ),
-                        ),
+                        items: images.map((image) {
+                          return Builder(
+                            builder: (BuildContext context) {
+                              return Image.asset(
+                                image,
+                                fit: BoxFit.cover,
+                                width: MediaQuery.of(context).size.width,
+                              );
+                            },
+                          );
+                        }).toList(),
                       ),
                       const SizedBox(
-                        height: 10,
+                        height: 15,
                       ),
-                      const SectionWidget(
-                          texto: 'DECORACIÓN', rutaNavegacion: Home()),
-                      const ItemWidget(
-                        rutaImagen: 'images/silla.jpg',
-                        rutaNavegacion: Item(
-                          previousViewName: 'Inicio',
-                          rutaImagen: 'images/silla.jpg',
-                        ),
+                      //!Contenedor con el ListView
+                      ListView(
+                        shrinkWrap: true,
+                        physics:
+                            const NeverScrollableScrollPhysics(), // Deshabilita el scroll en el ListView
+                        children: [
+                          Container(
+                            color: const Color(0xFF80A6AD),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'UNA\nMEZCLA DE\nDISEÑO Y\nCOMODIDAD',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize:
+                                          MediaQuery.of(context).size.width *
+                                              0.08,
+                                      color: const Color(0xFF203040),
+                                    ),
+                                  ),
+                                  Text(
+                                    'Crea el espacio \nperfecto',
+                                    style: TextStyle(
+                                      fontSize:
+                                          MediaQuery.of(context).size.width *
+                                              0.06,
+                                      fontWeight: FontWeight.normal,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  const Divider(
+                                    color: Color(0xFF607d82),
+                                    thickness: 2,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          SectionWidget(
+                            texto: 'DECORACIÓN',
+                            rutaNavegacion: CategoryPage(
+                              title: 'Deco',
+                              previousViewName: 'Inicio',
+                            ),
+                          ),
+                          ItemWidget(product: products[4]),
+                          ItemWidget(product: products[1]),
+                          ItemWidget(product: products[8]),
+                          SectionWidget(
+                            texto: 'COCINA',
+                            rutaNavegacion: CategoryPage(
+                              title: 'Cocina',
+                              previousViewName: 'Inicio',
+                            ),
+                          ),
+                          ItemWidget(product: products[11]),
+                          ItemWidget(product: products[14]),
+                          ItemWidget(product: products[17]),
+                          SectionWidget(
+                            texto: 'RECÁMARA',
+                            rutaNavegacion: CategoryPage(
+                              title: 'Recamara',
+                              previousViewName: 'Inicio',
+                            ),
+                          ),
+                          ItemWidget(product: products[23]),
+                          ItemWidget(product: products[24]),
+                          ItemWidget(product: products[2]),
+                        ],
                       ),
-                      const SectionWidget(
-                          texto: 'COCINA', rutaNavegacion: Home()),
-                      const ItemWidget(
-                          rutaImagen: 'images/cucharas.jpg',
-                          rutaNavegacion: Home()),
-                      const SectionWidget(
-                          texto: 'RECÁMARA', rutaNavegacion: Home()),
-                      const ItemWidget(
-                          rutaImagen: 'images/Cojín.jpg',
-                          rutaNavegacion: Home()),
+                      const SizedBox(height: 20),
                     ],
                   ),
-                ],
-              ),
+                ),
+                CustomFooter(), // footer
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
-    );
-  }
-}
-
-//!Widget para mostrar los elementos del menú
-class CustomListTile extends StatelessWidget {
-  final String title;
-  final Widget rutaNavegacion;
-
-  const CustomListTile(
-      {super.key, required this.title, required this.rutaNavegacion});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(title),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => rutaNavegacion,
-          ),
-        );
-      },
     );
   }
 }
@@ -225,8 +240,11 @@ class SectionWidget extends StatelessWidget {
   final String texto;
   final Widget rutaNavegacion;
 
-  const SectionWidget(
-      {super.key, required this.texto, required this.rutaNavegacion});
+  const SectionWidget({
+    super.key,
+    required this.texto,
+    required this.rutaNavegacion,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -248,8 +266,9 @@ class SectionWidget extends StatelessWidget {
             child: Center(
               child: Text(
                 texto,
-                style: const TextStyle(
-                  fontSize: 30,
+                style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.width *
+                      0.09, // Ajusta este valor para cambiar el tamaño del texto
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
@@ -267,11 +286,12 @@ class SectionWidget extends StatelessWidget {
 
 //!Widget para mostrar los items de las secciones
 class ItemWidget extends StatelessWidget {
-  final String rutaImagen;
-  final Widget rutaNavegacion;
+  final Product product;
 
-  const ItemWidget(
-      {super.key, required this.rutaImagen, required this.rutaNavegacion});
+  const ItemWidget({
+    super.key,
+    required this.product,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -282,29 +302,38 @@ class ItemWidget extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => rutaNavegacion,
+                builder: (context) => Item(
+                  previousViewName: 'Inicio',
+                  product: product,
+                ),
               ),
             );
           },
           child: Stack(
             children: [
-              Image.asset(
-                rutaImagen,
-                fit: BoxFit
-                    .cover, // Ajusta la imagen para cubrir todo el contenedor
+              AspectRatio(
+                aspectRatio:
+                    3 / 3, // Ajusta esta proporción según tus necesidades
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child: Image.network(
+                    product.imageUrl,
+                    fit: BoxFit
+                        .contain, // Ajusta la imagen dentro del contenedor sin recortarla
+                  ),
+                ),
               ),
               Positioned.fill(
                 child: Container(
                   color: Colors
-                      .transparent, // Para que el contenedor sea transparente
-                  // Aquí puedes agregar cualquier contenido adicional que necesites
+                      .transparent, // Si necesitas un color superpuesto o transparente
                 ),
               ),
             ],
           ),
         ),
         const SizedBox(
-          height: 10,
+          height: 15,
         ),
       ],
     );
@@ -312,8 +341,7 @@ class ItemWidget extends StatelessWidget {
 }
 
 final List<String> images = [
-  'https://hips.hearstapps.com/hmg-prod/images/plantas-de-interior-resistentes-2-1543351859.jpg',
-  'https://hips.hearstapps.com/hmg-prod/images/plantas-de-interior-resistentes-2-1543351859.jpg',
-  'https://hips.hearstapps.com/hmg-prod/images/plantas-de-interior-resistentes-2-1543351859.jpg',
-  //imagenes para probar el PageView
+  'images/Macetas.jpg',
+  'images/Silla2.jpg',
+  'images/Espejo.jpg',
 ];
