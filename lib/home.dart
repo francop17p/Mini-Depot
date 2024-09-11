@@ -30,11 +30,15 @@ class _HomeState extends State<Home> with RouteAware {
 
   Future<List<Product>> fetchProducts() async {
     List<Product> products = [];
+
     for (String category in ['Deco', 'Cocina', 'Recamara']) {
       var collection = FirebaseFirestore.instance.collection(category);
-      var querySnapshot = await collection.limit(1).get();
-      if (querySnapshot.docs.isNotEmpty) {
-        var doc = querySnapshot.docs.first;
+      var querySnapshot = await collection
+          .limit(10)
+          .get(); // Límite de 5 productos por categoría
+
+      // Iterar sobre todos los documentos obtenidos en la consulta
+      for (var doc in querySnapshot.docs) {
         products
             .add(Product.fromMap(doc.data() as Map<String, dynamic>, doc.id));
       }
@@ -192,7 +196,9 @@ class _HomeState extends State<Home> with RouteAware {
                               previousViewName: 'Inicio',
                             ),
                           ),
-                          ItemWidget(product: products[0]),
+                          ItemWidget(product: products[4]),
+                          ItemWidget(product: products[1]),
+                          ItemWidget(product: products[8]),
                           SectionWidget(
                             texto: 'COCINA',
                             rutaNavegacion: CategoryPage(
@@ -200,7 +206,9 @@ class _HomeState extends State<Home> with RouteAware {
                               previousViewName: 'Inicio',
                             ),
                           ),
-                          ItemWidget(product: products[1]),
+                          ItemWidget(product: products[11]),
+                          ItemWidget(product: products[14]),
+                          ItemWidget(product: products[17]),
                           SectionWidget(
                             texto: 'RECÁMARA',
                             rutaNavegacion: CategoryPage(
@@ -208,6 +216,8 @@ class _HomeState extends State<Home> with RouteAware {
                               previousViewName: 'Inicio',
                             ),
                           ),
+                          ItemWidget(product: products[23]),
+                          ItemWidget(product: products[24]),
                           ItemWidget(product: products[2]),
                         ],
                       ),
@@ -301,28 +311,29 @@ class ItemWidget extends StatelessWidget {
           },
           child: Stack(
             children: [
-              Container(
-                height: MediaQuery.of(context).size.height *
-                    0.75, // Ajusta este valor para cambiar la altura
-                width: MediaQuery.of(context).size.width, //
-                child: Image.network(
-                  product.imageUrl,
-                  fit: BoxFit.cover,
+              AspectRatio(
+                aspectRatio:
+                    3 / 3, // Ajusta esta proporción según tus necesidades
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child: Image.network(
+                    product.imageUrl,
+                    fit: BoxFit
+                        .contain, // Ajusta la imagen dentro del contenedor sin recortarla
+                  ),
                 ),
               ),
               Positioned.fill(
                 child: Container(
-                  color: Colors.transparent,
+                  color: Colors
+                      .transparent, // Si necesitas un color superpuesto o transparente
                 ),
               ),
             ],
           ),
         ),
         const SizedBox(
-          height: 10,
-        ),
-        const SizedBox(
-          height: 10,
+          height: 15,
         ),
       ],
     );

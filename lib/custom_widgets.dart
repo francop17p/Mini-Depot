@@ -27,15 +27,23 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       automaticallyImplyLeading: false,
       backgroundColor: Colors.white,
-      title: const Text(
-        'MiniDepot',
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          color: Color(0xFF405357),
-          decoration: TextDecoration.underline,
-          decorationColor: Color(0xFF405357),
-          decorationThickness: 3, // Grosor del subrayado
-          letterSpacing: 3,
+      title: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const Home()),
+          );
+        },
+        child: const Text(
+          'MiniDepot',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF405357),
+            decoration: TextDecoration.underline,
+            decorationColor: Color(0xFF405357),
+            decorationThickness: 3, // Grosor del subrayado
+            letterSpacing: 3,
+          ),
         ),
       ),
       actions: [
